@@ -22,11 +22,23 @@ Help us find bugs, add new features or simply just feel free to use it. Download
 
 
 ## Sources
-The source code can be found in our [ GitHub](https://github.com/canchito-dev/canchito-workflow-manager) site.
+The source code can be found in our [GitHub](https://github.com/canchito-dev/canchito-workflow-manager) site.
 
 *   `back-end`: has the source code for the back-end
 *   `front-end`: has the source code for the fron-end
 *   `palette`: contains the source code for the Eclipse palette
+
+Here is a detail explanation of the `back-end` modules:
+
+*   `cwm-app`: Main module. Has all the main resources and configurations
+*   `cwm-cloud`: Has all the implementations to use the different cloud services
+*   `cwm-core`: Handles CWM's Async Job Executor
+*   `cwm-dao`: Handles all the database accesses. You can find all the repositories and entities here
+*   `cwm-flowable`: Implementations created for seamlessly integrate with [Flowable](https://www.flowable.org/)
+*   `cwm-rest-api`: Rest controllers for CWM
+*   `cwm-service`: Handles the business logic
+*   `cwm-cloud`: Contains all the task behaviors and runnables used in CWM's Async Job Executor
+*   `cwm-utils`: Has all the app's utils
 
 
 ## License
