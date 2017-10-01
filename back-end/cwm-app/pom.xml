@@ -1,0 +1,104 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.canchitodev</groupId>
+		<artifactId>canchito-workflow-manager</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>cwm-app</artifactId>
+	<packaging>war</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.canchitodev</groupId>
+			<artifactId>cwm-flowable</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.canchitodev</groupId>
+			<artifactId>cwm-cloud</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.canchitodev</groupId>
+			<artifactId>cwm-core</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.canchitodev</groupId>
+			<artifactId>cwm-dao</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.canchitodev</groupId>
+			<artifactId>cwm-rest-api</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.canchitodev</groupId>
+			<artifactId>cwm-services</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.canchitodev</groupId>
+			<artifactId>cwm-tasks</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.canchitodev</groupId>
+			<artifactId>cwm-utils</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				
+				<!-- make the app executable -->
+ 				<configuration>
+					<executable>false</executable>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+    <repositories>
+        <repository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
+    </repositories>
+    
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </pluginRepository>
+    </pluginRepositories>
+	
+	<name>canchito-workflow-manager-maim</name>
+	<description>A RESTful Web Service developed in Spring that extends Flowable engine, and by doing so, it turns it into a very powerful workflow manager</description>
+	
+	<organization>
+		<name>Canchito Development</name>
+		<url>http://www.canchito-dev.com</url>
+	</organization>
+	
+	<issueManagement>
+		<system>Canchito Development</system>
+		<url>https://github.com/canchito-dev/canchito-workflow-manager/issues</url>
+	</issueManagement>
+	
+	<url>https://github.com/canchito-dev/canchito-workflow-manager</url>
+</project>

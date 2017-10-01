@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://wwwcanchito-dev.com/test">
+  <process id="moveLocalToLocalProcess" name="Move Local To Local Process" isExecutable="true">
+    <documentation>Moves a file from local repository to local repository</documentation>
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <serviceTask id="movetask1" name="Move Task (Local - Local) " activiti:delegateExpression="$moveTaskBehavior}">
+      <extensionElements>
+        <activiti:field name="destinationFileHandler">
+          <activiti:string><![CDATA[localFh]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="destinationFolderHandler">
+          <activiti:string><![CDATA[LOCAL]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="sourceFileHandler">
+          <activiti:string><![CDATA[Original]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="filenamePattern">
+          <activiti:string><![CDATA[localToLocal.mpg]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="movetask1"></sequenceFlow>
+    <boundaryEvent id="boundaryerror1" name="Error" attachedToRef="movetask1">
+      <errorEventDefinition errorRef="bpmnError"></errorEventDefinition>
+    </boundaryEvent>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow7" sourceRef="boundaryerror1" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="movetask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_moveLocalToLocalProcess">
+    <bpmndi:BPMNPlane bpmnElement="moveLocalToLocalProcess" id="BPMNPlane_moveLocalToLocalProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="21.0" y="113.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="movetask1" id="BPMNShape_movetask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="100.0" y="100.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundaryerror1" id="BPMNShape_boundaryerror1">
+        <omgdc:Bounds height="30.0" width="30.0" x="150.0" y="96.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="260.0" y="113.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="56.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="100.0" y="130.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="165.0" y="96.0"></omgdi:waypoint>
+        <omgdi:waypoint x="164.0" y="54.0"></omgdi:waypoint>
+        <omgdi:waypoint x="277.0" y="54.0"></omgdi:waypoint>
+        <omgdi:waypoint x="277.0" y="113.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="205.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="260.0" y="130.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

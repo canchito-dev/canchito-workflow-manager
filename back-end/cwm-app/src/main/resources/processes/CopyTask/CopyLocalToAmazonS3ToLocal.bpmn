@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://wwwcanchito-dev.com/test">
+  <process id="copyLocalToAmazonS3ToLocalProcess" name="Copy Local To Amazon S3 To Local Process" isExecutable="true">
+    <documentation>Uploads a file from local repository to Amazon S3 repository. Afterwards, it downloads the copy from Amazon S3 to a local repository</documentation>
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <serviceTask id="copytask1" name="Copy Task (Local - Amazon S3) " activiti:delegateExpression="${copyTaskBehavior}">
+      <extensionElements>
+        <activiti:field name="destinationFileHandler">
+          <activiti:string><![CDATA[s3Fh]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="destinationFolderHandler">
+          <activiti:string><![CDATA[AMAZON_S3]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="sourceFileHandler">
+          <activiti:string><![CDATA[Original]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="copytask1"></sequenceFlow>
+    <boundaryEvent id="boundaryerror1" name="Error" attachedToRef="copytask1">
+      <errorEventDefinition errorRef="bpmnError"></errorEventDefinition>
+    </boundaryEvent>
+    <serviceTask id="copytask2" name="Copy Task (FTP - Local)" activiti:delegateExpression="${copyTaskBehavior}">
+      <extensionElements>
+        <activiti:field name="destinationFileHandler">
+          <activiti:string><![CDATA[localFh]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="destinationFolderHandler">
+          <activiti:string><![CDATA[LOCAL]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="sourceFileHandler">
+          <activiti:string><![CDATA[s3Fh]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="filenamePattern">
+          <activiti:string><![CDATA[amazonS3ToLocal.mpg]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="flow2" sourceRef="copytask1" targetRef="copytask2"></sequenceFlow>
+    <boundaryEvent id="boundaryerror2" name="Error" attachedToRef="copytask2">
+      <errorEventDefinition errorRef="bpmnError"></errorEventDefinition>
+    </boundaryEvent>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow7" sourceRef="boundaryerror1" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="boundaryerror2" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow12" sourceRef="copytask2" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_copyLocalToAmazonS3ToLocalProcess">
+    <bpmndi:BPMNPlane bpmnElement="copyLocalToAmazonS3ToLocalProcess" id="BPMNPlane_copyLocalToAmazonS3ToLocalProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="21.0" y="113.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="copytask1" id="BPMNShape_copytask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="100.0" y="100.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundaryerror1" id="BPMNShape_boundaryerror1">
+        <omgdc:Bounds height="30.0" width="30.0" x="150.0" y="96.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="copytask2" id="BPMNShape_copytask2">
+        <omgdc:Bounds height="61.0" width="105.0" x="240.0" y="100.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundaryerror2" id="BPMNShape_boundaryerror2">
+        <omgdc:Bounds height="30.0" width="30.0" x="300.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="390.0" y="113.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="56.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="100.0" y="130.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="205.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="240.0" y="130.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="165.0" y="96.0"></omgdi:waypoint>
+        <omgdi:waypoint x="164.0" y="54.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="54.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="113.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="315.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="314.0" y="54.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="54.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="113.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="345.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="390.0" y="130.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
