@@ -1,0 +1,32 @@
+{
+    "name": "canchito-dev/canchito-workflow-manager",
+    "type": "project",
+    "description": "CANCHITO-WORKFLOW-MANAGER (CWM) is a powerful and yet light-weight and easy to use solution for handling workflows and business processes. At its core is a high performance open-source business process engine based on Flowable (https://www.flowable.org/) with the flexibility and scalability to handle a wide variety of critical processes.",
+    "keywords": ["flowable", "bpmn", "workflow", "activiti", "bpmn-engine", "workflow-engine", "open-source projects"],
+    "homepage": "https://github.com/canchito-dev/canchito-workflow-manager",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "José Carlos Mendoza Prego",
+            "role": "Developer",
+            "email": "***USERNAME***",
+            "homepage": "http://www.canchito-dev.com/"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/canchito-dev/canchito-workflow-manager/issues",
+        "source": "https://github.com/canchito-dev/canchito-workflow-manager"
+    },
+    "require": {
+        "php": ">=5.3.0",
+        "phpmailer/phpmailer": "5.2.16",
+        "guzzlehttp/guzzle": "~6.0@dev"
+    },
+    "autoload": {
+    	"classmap": [
+    		"application/core",
+    		"application/model",
+    		"application/libs"
+    	]
+    }
+}
