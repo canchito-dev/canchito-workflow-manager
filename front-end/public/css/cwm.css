@@ -1,0 +1,106 @@
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+	position: relative;
+  	min-height: 100%;
+}
+
+body {
+	margin-top: 10px; /* Margin top by header height */
+  	margin-bottom: 60px; /* Margin bottom by footer height */
+}
+
+.footer {
+  	position: absolute;
+  	bottom: 0;
+  	width: 100%;
+  	height: 60px;	/* Set the fixed height of the footer here */
+  	line-height: 60px; /* Vertically center the text there */
+  	background-color: #f5f5f5;
+}
+
+.btn, .page-link {
+	cursor: pointer;
+}
+
+
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+body > .container, body > .container-fluid {
+  	padding: 60px 15px 0;
+}
+
+.footer > .container {
+  	padding-right: 15px;
+  	padding-left: 15px;
+}
+
+code {
+  	font-size: 80%;
+}
+
+.shadow {
+	-webkit-box-shadow: 2px 2px 2px 2px #E8E8E8;
+	box-shadow: 2px 2px 2px 2px #E8E8E8;
+}
+
+/* Chat messages styles
+-------------------------------------------------- */
+.chat-container {
+    border: 2px solid #dedede;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 0 0 10px;
+}
+
+.darker {
+    border-color: #ccc;
+    background-color: #ddd;
+}
+
+.chat-container::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.chat-container img {
+    float: left;
+    max-width: 60px;
+    width: 100%;
+    margin-right: 20px;
+    border-radius: 50%;
+}
+
+.chat-container img.right {
+    float: right;
+    margin-left: 20px;
+    margin-right:0;
+}
+
+.time-right {
+    float: right;
+    color: #aaa;
+}
+
+.time-left {
+    float: left;
+    color: #999;
+}
+
+/* Rules for sizing the icon. */
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-36 { font-size: 36px; }
+.material-icons.md-48 { font-size: 48px; }
+
+/* Rules for using icons as black on a light background. */
+.material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
+.material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
+
+/* Rules for using icons as white on a dark background. */
+.material-icons.md-light { color: rgba(255, 255, 255, 1); }
+.material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
