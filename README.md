@@ -238,15 +238,15 @@ In addition, the shared unbound in-memory queue is stored in a database table ca
 ### Async Executor's Design
 Whenever CWM is started, the async job executor's queue is re-built, by reading the _CWM_TASKS_QUEUE_ table, and afterwards adding them to the in-memory queue. Once they are in the shared unbounded in-memory queue, they will be executed.
 
-![CANCHITO-DEV: async-job-executor-load-queue](http://canchito-dev.com/img/userguide/canchito_dev_async-job-executor-load-queue.png)
+![CANCHITO-DEV: async-job-executor-load-queue](http://canchito-dev.com/img/cwm/userguide/canchito_dev_async-job-executor-load-queue.png)
 
 In order to understand the way long-running tasks are added to the queue, lets have a look at a very simple workflow as the one in the below image. As you can see, it is composed of a start event, a copy task (which is a service task), and an end event.
 
-![CANCHITO-DEV: copy-task-sample-workflow](http://canchito-dev.com/img/userguide/canchito_dev_copy-task-sample-workflow.png)
+![CANCHITO-DEV: copy-task-sample-workflow](http://canchito-dev.com/img/cwm/userguide/canchito_dev_copy-task-sample-workflow.png)
 
 The copy task is a long-running service task, which needs to be processed by the async job executor. Long-runing tasks in CWM implement [Flowable](https://www.flowable.org/)'s TaskFlowableBehavior interface. The TaskFlowableBehavior provides two methods: <code>execute()</code> and <code>trigger()</code>:
 
-![CANCHITO-DEV: async-job-executor-submit](http://canchito-dev.com/img/userguide/canchito_dev_async-job-executor-submit.png)
+![CANCHITO-DEV: async-job-executor-submit](http://canchito-dev.com/img/cwm/userguide/canchito_dev_async-job-executor-submit.png)
 
 The <code>execute(DelegateExecution execution)</code> method is invoked when the service task is entered. It is typically used for submitting an asynchronous task to the actual service. After submitting the task and the method returns, the process engine will **not** continue execution. The TaskFlowableBehavior acts as a wait state. This means, that the process instances is put in hold, until a signal to continue is received.
 
