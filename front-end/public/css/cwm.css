@@ -104,3 +104,15 @@ code {
 /* Rules for using icons as white on a dark background. */
 .material-icons.md-light { color: rgba(255, 255, 255, 1); }
 .material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
+
+.selectize-dropdown { z-index: 9999; }
+
+.selectize-form-control {
+    display: block;
+    min-width: 200px;
+    font-size: 1rem;
+    line-height: 1.25;
+    border-radius: .25rem;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    text-align: left;
+}
