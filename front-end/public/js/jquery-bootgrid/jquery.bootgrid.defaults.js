@@ -212,9 +212,16 @@
          * @for defaults
          * @since 1.1.0
          **/
-        requestHandler: function (request) {
+        requestHandler: function (request) {        	
 	    	this.orgRequest = request;
-        	return this.fieldHandler(request); 
+	    	
+        	return this.fieldHandler({
+    			current : request.current,
+    			searchPhrase : request.searchPhrase,
+        		order : request.sort, 
+    			start : (request.current - 1) * request.rowCount, 
+    			size : request.rowCount
+        	}); 
         },
         
         /**
@@ -226,7 +233,15 @@
          * @for defaults
          * @since 1.1.0
          **/
-        fieldHandler: function (request) { return request; },
+        fieldHandler: function (request) { 
+        	return {
+				current : request.current,
+				searchPhrase : request.searchPhrase,
+	    		order : request.sort, 
+				start : (request.current - 1) * request.rowCount, 
+				size : request.rowCount
+	    	}; 
+    	},
 
         /**
          * Transforms the response object into the expected JSON response object.
@@ -429,7 +444,7 @@
             paginationItem: '<li class="page-item"><a class="page-link" data-page="{{ctx.page}}">{{ctx.text}}</a></li>',
             rawHeaderCell: '<th class="{{ctx.css}}">{{ctx.content}}</th>', // Used for the multi select box
             row: '<tr{{ctx.attr}}>{{ctx.cells}}</tr>',
-            search: '<div class="{{css.search}}"><div class="input-group"><span class="input-group-addon"><i class="{{css.icon}} {{css.iconSearch}}"></i></span> <input type="text" class="{{css.searchField}}" placeholder="{{lbl.search}}" /></div></div>',
+            search: '<div class="{{css.search}} d-none"><div class="input-group"><span class="input-group-addon"><i class="{{css.icon}} {{css.iconSearch}}"></i></span> <input type="text" class="{{css.searchField}}" placeholder="{{lbl.search}}" /></div></div>',
             select: '<input name="select" type="{{ctx.type}}" class="{{css.selectBox}}" value="{{ctx.value}}" {{ctx.checked}} />'
         }
     });

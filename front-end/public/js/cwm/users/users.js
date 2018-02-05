@@ -30,8 +30,8 @@ $(document).ready(function() {
 	
 	User.init(url);
 	
-	var $grid = $('#grid-data').bootgrid({
-	    url: url + 'users/getListOfUsers',
+	var $usersGrid = $('#grid-data').bootgrid({
+	    url: url + User.getUrl('listOfUsers'),
 	    formatters: {
 	        "commands": function(column, row) {
 	            return '<button type="button" class="btn btn-sm btn-dark command-edit" data-row-id="' + row.id + '" data-toggle="tooltip" title="Edit"><span class="fas fa-edit"></span></button> ' + 
@@ -39,6 +39,7 @@ $(document).ready(function() {
 	        }
 	    },
 	    fieldHandler: function(request) {
+	    	request.searchPhrase = $('form[name="formFilterUser"]').serializeArray();
 	    	return User.requestFilter(request);
 	    },
 	    templates: {
@@ -46,13 +47,15 @@ $(document).ready(function() {
             		'<!--Your Button goes here-->' +
             		'<div class="btn-group mr-4" role="group" aria-label="...">' +
             		'<button type="button" class="btn btn-dark" id="btnNew" name="btnNew" data-toggle="tooltip" title="New"><i class="fas fa-plus" aria-hidden="true"></i></button>' +
-            		'<button type="button" class="btn btn-dark" id="btnBatchDelete" name="btnBatchDelete" data-toggle="tooltip" title="Delete"><i class="fas fa-trash-alt" aria-hidden="true"></i></button></div>' +
+            		'<button type="button" class="btn btn-dark" id="btnBatchDelete" name="btnBatchDelete" data-toggle="tooltip" title="Delete"><i class="fas fa-trash-alt" aria-hidden="true"></i></button>' +
+            		'<button type="button" class="btn btn-dark" id="btnFilterSearch" name="btnFilterSearch" data-toggle="tooltip" title="Filter"><i class="fas fa-search" aria-hidden="true"></i></button>' +
             		'<!--Your Button goes here-->' +
+            		'</div>' + 
             		'<p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div></div></div>'
         }
 	}).on("loaded.rs.jquery.bootgrid", function() {
 	    /* Executes after data is loaded and rendered */
-		$grid.find(".command-edit").on("click", function(e) {
+		$usersGrid.find(".command-edit").on("click", function(e) {
 	        $('form[name="formUser"]').find('input[name="action"]').val('update');
 	        
 	        var $userId = $('form[name="formUser"]').find('input[name="id"]');
@@ -106,7 +109,7 @@ $(document).ready(function() {
 					            	toastr["error"](response.reason);
 				            	} else {
 				    				toastr["success"]('User successfully deleted');
-				    				$grid.bootgrid('reload');
+				    				$usersGrid.bootgrid('reload');
 				            	}
 							}
 						});
@@ -141,7 +144,7 @@ $(document).ready(function() {
 		        if (result) {
 	            	$("body").mLoading('show');
 	            	
-	            	var selectedRows = $grid.bootgrid('getSelectedRows');
+	            	var selectedRows = $usersGrid.bootgrid('getSelectedRows');
 	            	var requests = [];
 	            	
 	            	$.each(selectedRows, function(key, rowData) {
@@ -168,7 +171,7 @@ $(document).ready(function() {
 	        				} else
 	            				toastr["success"]('Selected users successfully deleted');
 	        					
-	        				$grid.bootgrid('reload');
+	        				$usersGrid.bootgrid('reload');
 	        				$("body").mLoading('hide');
 	                	}
 	        		);
@@ -220,11 +223,24 @@ $(document).ready(function() {
 		            	toastr["error"](response.reason);
 	            	} else {
 	    				toastr["success"](response.reason);
-	    				$grid.bootgrid('reload');
+	    				$usersGrid.bootgrid('reload');
 	    				$('#userModal').modal('hide');
 	            	}
 				}
 			});
+		}
+	});
+	
+	$('button[name="btnFilterSearch"]').on('click', function() {
+		var $modal = $('#userFilterSeachModal');
+		$modal.find('.modal-title').text('Filter users');
+		$modal.modal('show');
+	});
+	
+	$('form[name="formFilterUser"]').validate({
+		submitHandler: function(form) {
+			$usersGrid.bootgrid('reload');
+			$('#userFilterSeachModal').modal('hide');
 		}
 	});
 });

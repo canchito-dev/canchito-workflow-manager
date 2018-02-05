@@ -36,13 +36,35 @@ var User = (function() {
 	var URLs = {
 		main: '',
 		edit: 'users/getSingleUser',
+		listOfUsers: 'users/getListOfUsers',
 		erase: 'users/deleteUser',
 		save: 'users/saveUser'
 	};
 	
 	// Public variables and functions
 	user.init = function(url) {
-		URLs.main = url;
+		URLs.main = url || URLs.listOfUsers;
+	};
+	
+	/**
+	 * Returns a specific URL based on the url parameter
+	 * @param url 		- The URL to get
+     * @return The requested URL
+	 **/
+	user.getUrl = function(url) {
+		url = url || 'main';
+		switch(url) {
+			case 'main':
+				return URLs.main;
+			case 'edit':
+				return URLs.edit;
+			case 'listOfUsers':
+				return URLs.listOfUsers;
+			case 'erase':
+				return URLs.erase;
+			case 'save':
+				return URLs.save;
+		}
 	};
     
 	/**
@@ -52,10 +74,9 @@ var User = (function() {
      * @return The ajax request response
 	 **/
 	user.edit = function(userId, ajaxSettings) {
-		Ajax.setAjaxSettings(ajaxSettings);
 		var url = URLs.main + URLs.edit;
 		var data = { 'id' : userId };
-		return Ajax.executeAjax(url, data);
+		return Ajax.executeAjax(url, data, ajaxSettings);
     };
     
     /**
@@ -65,10 +86,9 @@ var User = (function() {
      * @return The ajax request response
 	 **/
     user.erase = function(userId, ajaxSettings) {
-		Ajax.setAjaxSettings(ajaxSettings);
 		var url = URLs.main + URLs.erase;
 		var data = { 'id' : userId };
-		return Ajax.executeAjax(url, data);
+		return Ajax.executeAjax(url, data, ajaxSettings);
     };
     
     /**
@@ -78,9 +98,8 @@ var User = (function() {
      * @return The ajax request response
 	 **/
     user.save = function(data, ajaxSettings) {
-		Ajax.setAjaxSettings(ajaxSettings);
 		var url = URLs.main + URLs.save;
-		return Ajax.executeAjax(url, data);
+		return Ajax.executeAjax(url, data, ajaxSettings);
     };
     
     /**
@@ -89,42 +108,31 @@ var User = (function() {
      * @return The reqeust transformed to a valid Flowable Rest request
 	 **/
     user.requestFilter = function(request) {
-    	var sort = undefined;
-    	var order = undefined;
-    	var start = (request.current - 1) * request.rowCount;
-    	
-    	if(request.sort.hasOwnProperty('id')) {
-    		order = request.sort.id;
-    		sort = 'id';
-    	} else if(request.sort.hasOwnProperty('firstName')) {
-    		order = request.sort.firstName;
-    		sort = 'firstName';
-    	} else if(request.sort.hasOwnProperty('lastName')) {
-    		order = request.sort.lastName;
-    		sort = 'lastName';
-    	} else if(request.sort.hasOwnProperty('email')) {
-    		order = request.sort.email;
-    		sort = 'email';
+    	if(request.order.hasOwnProperty('id')) {
+    		request.order = request.order.id;
+    		request.sort = 'id';
+    	} else if(request.order.hasOwnProperty('firstName')) {
+    		request.order = request.order.firstName;
+    		request.sort = 'firstName';
+    	} else if(request.order.hasOwnProperty('lastName')) {
+    		request.order = request.order.lastName;
+    		request.sort = 'lastName';
+    	} else if(request.order.hasOwnProperty('email')) {
+    		request.order = request.order.email;
+    		request.sort = 'email';
     	}
     	
     	if(request.hasOwnProperty('searchPhrase')) {
-    		if(request.searchPhrase != '') {
-    			return {
-		    			sort : sort, 
-		    			order : order, 
-		    			start : start, 
-		    			size : request.rowCount,
-		    			emailLike : '%' + request.searchPhrase + '%'
-		    	};
+    		if(request.searchPhrase.length > 0) {
+	    		request.searchPhrase.forEach(function(value, key) { 
+	    			if(value.value != '' && value.value != undefined)
+	    				request[value.name] = (value.name.endsWith('Like')) ? '%' + value.value + '%' : value.value;
+	    		});
     		}
+    		delete request.searchPhrase;
     	}
     	
-    	return {
-    			sort : sort, 
-    			order : order, 
-    			start : start, 
-    			size : request.rowCount
-    	};
+    	return request;
     }
 
     return user;
