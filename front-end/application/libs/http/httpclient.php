@@ -41,7 +41,7 @@ class HttpClient {
 		if(is_null($baseUri) || empty($baseUri))
 			throw new Core\Exception('No URL specified');
 		
-		$this->client = new Client([ 'base_uri' => $baseUri]);
+		$this->client = new Client([ 'base_uri' => $baseUri ]);
 		
 		$this->options = [
 			'debug' => FALSE,
@@ -128,6 +128,21 @@ class HttpClient {
 	
 	public function getHttpErrors() {
 		return $this->options['http_errors'];
+	}
+	
+	public function getMultipart() {
+	    return $this->options['multipart'];
+	}
+	
+	public function setMultipart($multipart = []) {
+// 	    You can send files along with a form (multipart/form-data POST requests), using the multipart request option. multipart accepts an array of associative arrays
+//         	    'multipart' => [
+//         	        'name'     => '',
+//         	        'contents' => '',
+//         	        'filename' => ''
+//         	    ]
+	    if(isset($this->options['form_params'])) unset($this->options['form_params']);
+	    $this->options['multipart'] = $multipart;
 	}
 	
 	private function request($method = 'GET', $uri) {
