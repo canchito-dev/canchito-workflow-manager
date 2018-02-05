@@ -129,10 +129,10 @@ define('DB_CHARSET', 'utf8');
  * 2 = client and server messages
  **/
 define('IS_SMTP', true); 								//Tell PHPMailer to use SMTP
-define('MAIL_SERVER', 'MAIL_SERVER'); 					//Set the hostname of the mail server
+define('MAIL_SERVER', '***MAIL_SERVER***'); 		    //Set the hostname of the mail server
 define('SMTP_PORT', 2525); 								//Set the SMTP port number - 587 for authenticated TLS, a.k.a. RFC4409 SMTP submission
-define('SMTP_USERNAME', 'SMTP_USERNAME'); 				//Username to use for SMTP authentication - use full email address for gmail
-define('SMTP_PWD', 'SMTP_PWD');							//Password to use for SMTP authentication
+define('SMTP_USERNAME', '***SMTP_USERNAME***'); 	    //Username to use for SMTP authentication - use full email address for gmail
+define('SMTP_PWD', '***SMTP_PWD***');					//Password to use for SMTP authentication
 define('SMTP_DEBUG', 0);								//Enable SMTP debugging
 define('SMTP_SECURE', 'tls');							//Set the encryption system to use - ssl (deprecated) or tls
 define('SMTP_AUTH', true);								//Whether to use SMTP authentication

@@ -64,13 +64,23 @@ class Controller extends Base {
     	    if($session->hasVariable('ID')
     	        && $session->hasVariable('EMAIL')
     	        && $session->hasVariable('SESSION_CREATED_TIMESTAMP')) {
-	            $httpHost = explode(".", $_SERVER['HTTP_HOST'], 2)[TENANT_ID_PART];
+	            $httpHost = $this->getHttpHostPart();
 	            
 	            if($httpHost == $session->getVariable('TENANT_ID'))
 	                return true;
 	        }
     	}
     	return false;
+    }
+    
+    protected function getHttpHostPart() {
+        return explode(".", $_SERVER['HTTP_HOST'], 3)[TENANT_ID_PART];
+    }
+    
+    protected function mergeTenant($toMerge) {
+        $tenant = '@' . explode(".", $_SESSION['TENANT_ID'], 2)[0];
+        $toMerge = strtolower($toMerge);
+        return (strpos($toMerge, '@') !== false) ? $toMerge : $toMerge . $tenant ;
     }
 
     /**

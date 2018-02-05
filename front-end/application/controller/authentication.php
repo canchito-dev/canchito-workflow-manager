@@ -60,7 +60,7 @@ class Authentication extends Controller {
     }
     
     public function signIn() {
-        $httpHost = explode(".", $_SERVER['HTTP_HOST'], 2)[TENANT_ID_PART];
+        $httpHost = $this->getHttpHostPart();
         $usernameDomain = explode("@", $_POST['username'], 2)[1];
         
         if($httpHost != $usernameDomain) {
