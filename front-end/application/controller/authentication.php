@@ -49,8 +49,8 @@ class Authentication extends Controller {
     	$localJs = array(
     	    'cwm/authentication/md5.min', 
     	    'cwm/authentication/utf8_encode.min',
-    		'bootstrap-password-toggler/bootstrap-password-toggler.min',
-    	    'cwm/authentication/signin.min'
+    	    'bootstrap-sign-in-web-component/bootstrap-sign-in-web-component.min',
+     	    'cwm/authentication/signin.min'
     	);
     	
         // load views
@@ -112,5 +112,10 @@ class Authentication extends Controller {
 
     	header('location: ' . URL . 'authentication');
     	exit();
+    }
+    
+    public function getSignInWebComponent() {
+        echo file_get_contents(APP . 'view/_templates/_web_components/signin.html');
+        exit();
     }
 }
