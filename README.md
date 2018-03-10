@@ -150,11 +150,39 @@ Copy the content of the `front-end`- folder into the Web server default folder a
 
 1.  Make sure you have _mod_rewrite_ activated on your server / in your environment.
 2.  Install Composer and run `composer install` in the project's folder to download the dependencies and create the autoloading stuff from Composer automatically. For those who are not familiar with Composer, just remember back in the days, when you were using a PHP files with all the includes you needed. Well, Composer creates classes that automatically do this.
-
+3.  Create a virtual host. For instance `cwm.canchito-dev.com`.
+4.  Go to folder `application/config` and open the file `config.php`. Here you will have to modify some parameters.
+    *   `TENANT_ID_PART`: Configuration for specifying which part of the `$_SERVER['HTTP_HOST']` variable use as a tenant id. For instance: `$_SERVER['HTTP_HOST'] = cwm.canchito-dev.com`. The system splits 'nahual.domain' by the '.' into two substrings  
+        If TENANT\_ID\_PART = 0, 'cwm' will be used as TENANT_ID  
+        If TENANT\_ID\_PART = 1, 'canchito-dev' will be used as TENANT_ID and so on
+    *   `CWM_URL_DOMAIN`: the domain where the back-end is running
+    *   `CWM_URL_PORT`: the port in which the back-end is listening
+    *   `CWM_URL_SUB_FOLDER`: the path of the main dispatcher servlet
 
 ### Back-End Setup
-> PENDING
+Open the configuration file `src/main/resources/application.properties` and modify:
 
+*   `server.address`: Network address to which the server should bind to
+*   `server.connection-timeout`: Time in milliseconds that connectors will wait for another HTTP request before closing the connection. When not set, the connector's container-specific default will be used. Use a value of -1 to indicate no (i.e. infinite) timeout
+*   `server.display-name`: Display name of the application
+*   `server.servlet-path`: Path of the main dispatcher servlet
+*   `server.port`: Server HTTP port
+*   `server.tomcat.max-connections`: Maximum number of connections that the server will accept and process at any given time
+*   `server.tomcat.max-threads`: Maximum amount of worker threads
+*   `server.tomcat.uri-encodin`: Character encoding to use to decode the URI
+
+For instance:
+
+```
+server.address=localhost
+server.connection-timeout=60000
+server.display-name=Canchito Workflow Manager
+server.servlet-path=/canchito-dev-rest
+server.port=10000
+server.tomcat.max-connections=100
+server.tomcat.max-threads=100
+server.tomcat.uri-encoding=UTF-8
+```
 
 ### Mail Configuration
 Mails can be sent from both the front- and the back-end. Let's first do the configuration for the front-ent by opening the `application/config/config.php` file and modifying the following parameter to suit your needs:
@@ -226,33 +254,29 @@ cwm.datasource.min-evictable-idle-time-millis=30000
 
 
 ## Async Job Executor
-CWM's async job executor, is in charge of executing all the service task that execute long-running tasks. It is basically a thread pool that reuses a (configurable) fixed number of threads operating off a shared unbounded in-memory (PriorityBlockingQueue) queue, using the provided ThreadFactory to create new threads when needed. At any point, at most nThreads threads will be active processing tasks.
+Put in simple words, CWM's async job executor are individual threads that are started once when the application is started. Each thread starts a thread pool that reuses a (configurable) fixed number of threads operating off database table called _CWM\_TASKS\_QUEUE_ and acting as a priority blocking, using the provided ThreadFactory to create new threads when needed. At any point, at most _n_ threads will be active processing tasks.
 
-If additional tasks are submitted when all threads are active, they will wait in the queue until a thread is available.
+Periodically, pending tasks are pulled from the database. The number of pending tasks that are pulled at once, depends on the number of available threads on CWM's async job executor for a specific task type. If additional tasks are submitted when all threads are active, they will reside in the database until a thread is available.
 
 If any thread terminates due to a failure during execution prior to shutdown, a new one will take its place if needed to execute subsequent tasks. The threads in the pool will exist until it is explicitly shutdown.
 
-In addition, the shared unbound in-memory queue is stored in a database table called _CWM_TASKS_QUEUE_. Register will be added as they are submitted, or deleted as they are completed.
+Once a task is pulled by a thread, it is locked. By locking it, we can have several CWM simultaneously running on different servers. Thus allowing us to have a fail-over, clustered system.
+
+If two or more CWM's async job executor, they all will be raising for pulling the pending tasks. Consequently, only the first one that looks the task, will be the one that will execute it. The other async job executor will get an optimistic locking exception.
 
 
 ### Async Executor's Design
-Whenever CWM is started, the async job executor's queue is re-built, by reading the _CWM_TASKS_QUEUE_ table, and afterwards adding them to the in-memory queue. Once they are in the shared unbounded in-memory queue, they will be executed.
-
-![CANCHITO-DEV: async-job-executor-load-queue](http://canchito-dev.com/img/cwm/userguide/canchito_dev_async-job-executor-load-queue.png)
-
 In order to understand the way long-running tasks are added to the queue, lets have a look at a very simple workflow as the one in the below image. As you can see, it is composed of a start event, a copy task (which is a service task), and an end event.
 
-![CANCHITO-DEV: copy-task-sample-workflow](http://canchito-dev.com/img/cwm/userguide/canchito_dev_copy-task-sample-workflow.png)
+![CANCHITO-DEV: async-job-executor-load-queue](http://canchito-dev.com/img/cwm/userguide/canchito_dev_copy-task-sample-workflow.png)
 
-The copy task is a long-running service task, which needs to be processed by the async job executor. Long-runing tasks in CWM implement [Flowable](https://www.flowable.org/)'s TaskFlowableBehavior interface. The TaskFlowableBehavior provides two methods: <code>execute()</code> and <code>trigger()</code>:
+The copy task is a long-running service task, which needs to be processed by the async job executor. Long-runing tasks in CWM implement [Flowable](https://www.flowable.org/)'s TaskFlowableBehavior interface. The TaskFlowableBehavior provides two methods: `execute()` and `trigger()`.
 
-![CANCHITO-DEV: async-job-executor-submit](http://canchito-dev.com/img/cwm/userguide/canchito_dev_async-job-executor-submit.png)
+The `execute(DelegateExecution execution)` method is invoked when the service task is entered. It is typically used for submitting an asynchronous task to the actual service. After submitting the task and the method returns, the process engine will **not** continue execution. The TaskFlowableBehavior acts as a wait state. This means, that the process instances is put in hold, until a signal to continue is received.
 
-The <code>execute(DelegateExecution execution)</code> method is invoked when the service task is entered. It is typically used for submitting an asynchronous task to the actual service. After submitting the task and the method returns, the process engine will **not** continue execution. The TaskFlowableBehavior acts as a wait state. This means, that the process instances is put in hold, until a signal to continue is received.
+The `trigger(DelegateExecution execution, String signalName, Object signalData)` method is invoked as the process engine is being triggered by the callback. The `trigger()` method is responsible for leaving the service task activity and allowing the normal flow of the process instance.
 
-The <code>trigger(DelegateExecution execution, String signalName, Object signalData)</code> method is invoked as the process engine is being triggered by the callback. The <code>trigger()</code> method is responsible for leaving the service task activity and allowing the normal flow of the process instance.
-
-By having a separate thread pool for executing long-running tasks, CWM has decoupled the process engine from the service implementation. From the point of view of [Flowable](https://www.flowable.org/)'s process engine, the TaskFlowableBehavior is a wait state: after the <code>execute()</code> method returns, the process engine will stop execution, makes the state of the execution to the database persistance and wait for the callback to occur.
+By having a separate thread pool for executing long-running tasks, CWM has decoupled the process engine from the service implementation. From the point of view of [Flowable](https://www.flowable.org/)'s process engine, the TaskFlowableBehavior is a wait state: after the `execute()` method returns, the process engine will stop execution, makes the state of the execution to the database persistance and wait for the callback to occur.
 
 As the long-running task implementation is not directly executed by [Flowable](https://www.flowable.org/)'s process engine and it does not participate in the process engine transaction, if there is an error in the service implementation, the failure will not cause the process engine to roll back.
 
@@ -260,7 +284,38 @@ As the long-running task implementation is not directly executed by [Flowable](h
 ### Async Executor's Configuration
 The async job executor configuration is done in the `src/main/resources/application.properties` file. Simply, modify the following parameter to suit your needs:
 
-*   `cwm.queues.queue[].core-pool-size`: the number of threads to keep in the pool, even if they are idle
-*   `cwm.queues.queue[].maximum-pool-size`: the maximum number of threads to allow in the pool
-*   `cwm.queues.queue[].keep-alive-time`: when the number of threads is greater than the core, this is the maximum time that excess idle
-*   `cwm.queues.queue[].bean-id`: the bean-id of long-runing task which the thread pool will execute. Must be written exacty as it is defined in the class path task-runnable-beans.xml bean definition
+The async job executor configuration is done by modifying two XML files (found under `src/main/resources/`):
+
+*   `task-queue-beans.xml`: specified how each CWM's async job executor, dedicated to process a specific task is configured
+*   `task-runnable-beans.xml`: here you will find the runnable classes that are used by each CWM's async job executor to execute the task
+
+As you can see, each queue used by the CWM's async job executor needs to have some configuration. Let's describe those parameters found in `task-queue-beans.xml` file.
+
+*   `runnableName`: the id of the runnable that and instance is initialized and afterward executed. This is the id which relates to the information found in `task-runnable-beans.xml`.
+*   `poolName`: the name of the thread pool
+*   `corePoolSize`: the number of threads to keep in the pool, even if they are idle
+*   `maximumPoolSize`: the maximum number of threads to allow in the pool
+*   `keepAliveTimeInMillis`: when the number of threads is greater than the core, this is the maximum time that excess idle threads will wait for new tasks before terminating
+*   `acquireWaitTimeInMillis`: millis to wait before new tasks are pulled from the database
+*   `maxTasksPerAcquisition`: maximum tasks that can be pulled from the database
+
+
+For instance `task-queue-beans.xml`:
+
+```xml
+<bean id="task1Queue" class="com.canchitodev.cwm.threadpool.service.TaskQueue" scope="prototype">
+	<property name="runnableName" value="task1Runnable" />
+	<property name="poolName" value="task1Queue" />
+	<property name="corePoolSize" value="2" />
+	<property name="maximumPoolSize" value="5" />
+	<property name="keepAliveTimeInMillis" value="300000"/>
+	<property name="acquireWaitTimeInMillis" value="5000"/>
+	<property name="maxTasksPerAcquisition" value="2"/>
+</bean>
+```
+
+For instance `task-runnable-beans.xml`:
+
+```xml
+<bean id="task1Runnable" class="com.canchitodev.cwm.tasks.runnable.Task1Runnable" scope="prototype"></bean>
+```
