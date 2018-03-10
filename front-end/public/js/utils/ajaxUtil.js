@@ -72,20 +72,26 @@ var Ajax = (function() {
 	 * Checks if the users sent new Ajax setting for overriding the default one
 	 * @param settings - A set of key/value pairs that configure the Ajax request.
 	 **/
-	ajax.setAjaxSettings = function(settings) {
+	var setAjaxSettings = function(settings) {
 		if (typeof settings !== "undefined")
-			ajaxSettings = $.extend(ajaxSettings, settings);
+			return $.extend(true, {}, ajaxSettings, settings);
+		return ajaxSettings;
 	}
 	
-	ajax.executeAjax = function(url, data) {
-		ajaxSettings = $.extend(ajaxSettings, {
+	// Public variables and functions
+	/**
+	 * Executes Ajax call
+	 * @param url		- The URL to call during the Ajax request.
+	 * @param data		- The data to pass to the Ajax request.
+	 * @param settings	- A set of key/value pairs that configure the Ajax request.
+	 **/
+	ajax.executeAjax = function(url, data, settings) {
+		var ajaxSettings = $.extend(setAjaxSettings(settings), {
 			url: url,
 			data: data
 		});
 		return $.ajax(ajaxSettings);
 	};
-	
-	// Public variables and functions
 
     return ajax;
 }());
