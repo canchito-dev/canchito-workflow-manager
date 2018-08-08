@@ -1,0 +1,249 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.canchitodev</groupId>
+	<artifactId>canchito-workflow-manager</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	
+	<modules>
+		<module>cwm-dao</module>
+		<module>cwm-services</module>
+		<module>cwm-utils</module>
+		<module>cwm-flowable</module>
+		<module>cwm-core</module>
+		<module>cwm-cloud</module>
+		<module>cwm-tasks</module>
+		<module>cwm-rest-api</module>
+		<module>cwm-app</module>
+	</modules>
+	
+	<parent><!-- Core starter, including auto-configuration support, logging and YAML -->
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.7.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent><!-- Core starter, including auto-configuration support, logging and YAML -->
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<flowable.version>6.1.2</flowable.version>
+		<java.uuid.generator>3.1.3</java.uuid.generator>
+		<aws.version>1.11.176</aws.version>
+		<amazon.kinesis.client>1.2.1</amazon.kinesis.client>
+		<jcifs.version>1.3.18.2</jcifs.version>
+		<ftp4j.version>1.7.2</ftp4j.version>
+		<apache.common-net.version>3.6</apache.common-net.version>
+	</properties>
+	
+	<dependencies>
+		<!-- Flowable Spring Boot Starter Basic -->
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-spring-boot-starter-basic</artifactId>
+			<version>${flowable.version}</version>
+		</dependency>
+		<!-- Flowable Spring Boot Starter Basic -->
+		
+		<!-- Flowable Spring Boot Starter Rest Api -->
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-spring-boot-starter-rest-api</artifactId>
+			<version>${flowable.version}</version>
+		</dependency>
+		<!-- Flowable Spring Boot Starter Rest Api -->
+		
+		<!-- Flowable Spring Boot Starter Actuator -->
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-spring-boot-starter-actuator</artifactId>
+			<version>${flowable.version}</version>
+		</dependency>
+		<!-- Flowable Spring Boot Starter Actuator -->
+		
+		<!-- UUID id generator for high concurrency -->
+	    <dependency>
+	      <groupId>com.fasterxml.uuid</groupId>
+	      <artifactId>java-uuid-generator</artifactId>
+	      <version>${java.uuid.generator}</version>
+	    </dependency>
+		<!-- UUID id generator for high concurrency -->
+		
+		<!-- Starter for using Spring Boot's Actuator which provides production ready features to help you monitor and manage your application -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<!-- Starter for using Spring Boot's Actuator which provides production ready features to help you monitor and manage your application -->
+		
+		<!-- Java Persistence API including spring-data-jpa, spring-orm and Hibernate -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<!-- Java Persistence API including spring-data-jpa, spring-orm and Hibernate -->
+		
+		<!-- Starter for building web, including RESTful, applications using Spring MVC. Uses Tomcat as the default embedded container -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<!-- Starter for building web, including RESTful, applications using Spring MVC. Uses Tomcat as the default embedded container -->
+		
+		<!-- Core starter, including auto-configuration support, logging and YAML -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter</artifactId>
+		    <exclusions>
+		        <exclusion>
+		            <groupId>org.springframework.boot</groupId>
+		            <artifactId>spring-boot-starter-logging</artifactId>
+		        </exclusion>
+		    </exclusions>
+		</dependency>
+		<!-- Core starter, including auto-configuration support, logging and YAML -->
+		
+		<!-- Starter for using Log4j2 for logging. An alternative to spring-boot-starter-logging -->
+		<dependency>
+		  <groupId>org.slf4j</groupId>
+		  <artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+		  <groupId>org.slf4j</groupId>
+		  <artifactId>slf4j-log4j12</artifactId>
+		</dependency>
+		<!-- Starter for using Log4j2 for logging. An alternative to spring-boot-starter-logging -->
+		
+		<!-- A simple Java toolkit for JSON
+			 https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+		<dependency>
+		    <groupId>com.googlecode.json-simple</groupId>
+		    <artifactId>json-simple</artifactId>
+		</dependency>
+		<!-- A simple Java toolkit for JSON
+			 https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+		
+		<!-- Databases  MySQL JDBC Type 4 drive -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- Databases  MySQL JDBC Type 4 drive -->
+		
+		<!-- Starter for using Tomcat as the embedded servlet container. Default servlet container starter used by spring-boot-starter-web -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<!-- Starter for using Tomcat as the embedded servlet container. Default servlet container starter used by spring-boot-starter-web -->
+		
+		<!-- Starter for testing Spring Boot applications with libraries including JUnit, Hamcrest and Mockito -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- Starter for testing Spring Boot applications with libraries including JUnit, Hamcrest and Mockito -->
+		
+		<!-- Spring Boot Configuration Processor -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<!-- Spring Boot Configuration Processor -->
+		
+		<!-- Spring Boot Developer Tools -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- Spring Boot Developer Tools -->
+		
+		<!-- The Amazon Web Services SDK for Java provides Java APIs for building software on AWS' cost-effective, scalable, and reliable infrastructure products. 
+			 The AWS Java SDK allows developers to code against APIs for all of Amazon's infrastructure web services (Amazon S3, Amazon EC2, Amazon SQS, Amazon 
+			 Relational Database Service, Amazon AutoScaling, etc). -->	 
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>${aws.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<!-- The Amazon Web Services SDK for Java provides Java APIs for building software on AWS' cost-effective, scalable, and reliable infrastructure products. 
+			 The AWS Java SDK allows developers to code against APIs for all of Amazon's infrastructure web services (Amazon S3, Amazon EC2, Amazon SQS, Amazon 
+			 Relational Database Service, Amazon AutoScaling, etc). -->
+
+		<!-- The Amazon Kinesis Client Library for Java enables Java developers to easily consume and process data from Amazon Kinesis. -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>amazon-kinesis-client</artifactId>
+			<version>${amazon.kinesis.client}</version>
+			<scope>compile</scope>
+		</dependency>
+		<!-- The Amazon Kinesis Client Library for Java enables Java developers to easily consume and process data from Amazon Kinesis. -->
+		
+		<!-- JCIFS is an Open Source client library that implements the CIFS/SMB networking protocol in 100% Java -->
+		<dependency>
+		    <groupId>org.codelibs</groupId>
+		    <artifactId>jcifs</artifactId>
+		    <version>${jcifs.version}</version>
+		</dependency>
+		<!-- JCIFS is an Open Source client library that implements the CIFS/SMB networking protocol in 100% Java -->
+			 
+		<!-- Apache Commons Net library contains a collection of network utilities and protocol implementations. Supported protocols include: 
+			Echo, Finger, FTP, NNTP, NTP, POP3(S), SMTP(S), Telnet, Whois -->
+		<dependency>
+		    <groupId>commons-net</groupId>
+		    <artifactId>commons-net</artifactId>
+		    <version>${apache.common-net.version}</version>
+		</dependency>
+		<!-- Apache Commons Net library contains a collection of network utilities and protocol implementations. Supported protocols include: 
+			Echo, Finger, FTP, NNTP, NTP, POP3(S), SMTP(S), Telnet, Whois -->
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				
+				<!-- make the app executable -->
+ 				<configuration>
+					<executable>false</executable>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+    <repositories>
+        <repository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
+    </repositories>
+    
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </pluginRepository>
+    </pluginRepositories>
+    
+    <url>https://github.com/canchito-dev/canchito-workflow-manager</url>
+    <description>A RESTful Web Service developed in Spring that extends Flowable engine, and by doing so, it turns it into a very powerful workflow manager</description>
+    <name>canchito-workflow-manager</name>
+    
+    <organization>
+    	<name>Canchito Development</name>
+    	<url>http://www.canchito-dev.com</url>
+    </organization>
+    
+    <issueManagement>
+    	<system>Canchito Development</system>
+    	<url>https://github.com/canchito-dev/canchito-workflow-manager/issues</url>
+    </issueManagement>
+</project>
