@@ -34,6 +34,8 @@ use Application\Libs\Methods;
  * @link		https://github.com/canchito-dev/mini-framework-mvc
  **/
 class Authentication extends Controller {
+    
+    private $groupModel = 'Groups';
 
     public function __construct() {
         $this->loadModel('Users');
@@ -78,25 +80,36 @@ class Authentication extends Controller {
         $_POST['password'] = sha1(md5($_POST['password']));
         
         $this->model->setAuth($_POST['username'], $_POST['password']);
-        $response = $this->model->getSingleUser($_POST['username']);
+        $user = $this->model->getSingleUser($_POST['username']);
         
-        if ($response['code'] >= 400) {
-            $response['reason'] .= '. Incorrect username or password';
+        if ($user['code'] >= 400) {
+            $user['reason'] .= '. Incorrect username or password';
             $this->session()->destroySession();
-            echo json_encode($response);
+            echo json_encode($user);
             exit();
+        }
+        
+        $this->groupModel = $this->loadModelAndReturnIt($this->groupModel);
+        $this->groupModel->setAuth($_POST['username'], $_POST['password']);
+        
+        $groups = $this->groupModel->getListOfGroups(array('member' => $user['body']->id));
+        if ($groups['code'] >= 400) {
+            $groups = array();
+        } else {
+            $groups = $groups['body']->data;
         }
         
         $this->session()->createSession();                
         $this->session()->setVariable('SESSION_CREATED_TIMESTAMP', time());
         $this->session()->setVariable(
             array(
-                'ID' => $response['body']->id,
-                'FIRST_NAME' =>  $response['body']->firstName,
-                'LAST_NAME' =>  $response['body']->lastName,
-                'EMAIL' => $response['body']->email,
+                'ID' => $user['body']->id,
+                'FIRST_NAME' =>  $user['body']->firstName,
+                'LAST_NAME' =>  $user['body']->lastName,
+                'EMAIL' => $user['body']->email,
                 'PASSWORD' => $_POST['password'],
-                'TENANT_ID' => $httpHost
+                'TENANT_ID' => $httpHost,
+                'GROUPS' => $groups
             )
         );
         

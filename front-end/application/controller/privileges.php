@@ -1,8 +1,14 @@
 <?php
+namespace Application\Controller;
+
+use Application\Core\Controller;
+use Application\Libs\Session;
+use Application\Libs\Methods;
+
 /**
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2018, canchito-dev
+ * Copyright (c) 2017, canchito-dev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,19 +27,15 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *
+ * 
  * @author 		Jose Carlos Mendoza Prego
- * @copyright	Copyright (c) 2018, canchito-dev (http://www.canchito-dev.com)
+ * @copyright	Copyright (c) 2017, canchito-dev (http://www.canchito-dev.com)
  * @license		http://opensource.org/licenses/MIT	MIT License
  * @link		https://github.com/canchito-dev/canchito-workflow-manager
  **/
-namespace Application\Controller;
-
-use Application\Core\Controller;
-
-class Groups extends Controller {
+class Privileges extends Controller {
 	
-	private $modelToLoad = 'Groups';
+	private $modelToLoad = 'Privilege';
 	
 	public function __construct() {
 		/**
@@ -49,10 +51,7 @@ class Groups extends Controller {
 	    $this->loadModel($this->modelToLoad);
 	    $this->model->setAuth($_SESSION['ID'], $_SESSION['PASSWORD']);
 		
-		parent::__construct();
-		
-		if(isset($_POST['id']))
-		    $_POST['id'] = $this->mergeTenant($_POST['id']);
+	    parent::__construct();
 	}
 	
     /**
@@ -64,75 +63,67 @@ class Groups extends Controller {
     			'Home' => 'home', 
     			'Management' => '',
     			'Identity Access' => '',
-    			'Groups' => 'groups'
+    			'Privilege' => 'privileges'
     	);
     	
-    	$localCss = array(
-    	    'jquery-bootgrid/jquery.bootgrid.min',
-    	    'selectize/selectize.default.min'
-    	);
+    	$localCss = array('jquery-bootgrid/jquery.bootgrid.min');
     	$localJs = array(
     	    'jquery-bootgrid/jquery.bootgrid.min',
-    	    'jquery-bootgrid/jquery.bootgrid.defaults.min',
-    	    'selectize/selectize.min',
+    	    'jquery-bootgrid/jquery.bootgrid.defaults.min', 
     	    'bootbox/bootbox.min',
     	    'utils/formUtil.min',
-    	    'cwm/users/user.min',
-    	    'cwm/groups/group.min',
-    	    'cwm/groups/groups.min'
+    	    'cwm/privileges/privilege.min',
+    	    'cwm/privileges/privileges.min'
     	);
     	
         // load views
         require APP . 'view/_templates/header.php';
         require APP . 'view/_templates/nav.header.php';
-        require APP . 'view/groups/index.php';
-        require APP . 'view/groups/modal/viewgroup.php';
-        require APP . 'view/groups/modal/filtergroup.php';
+        require APP . 'view/privileges/index.php';
         require APP . 'view/_templates/footer.php';
     }
     
-    public function getSingleGroup() {
-        echo json_encode($this->model->getSingleGroup($_POST['id']));
+    public function getSinglePrivilege() {
+        echo json_encode($this->model->getSinglePrivilege($_POST['id']));
         exit();
     }
     
-    public function getListOfGroups() {
-        echo json_encode($this->model->getListOfGroups($_POST));
+    public function getListOfPrivileges() {
+        echo json_encode($this->model->getListOfPrivileges($_POST));
         exit();
     }
     
-    public function saveGroup() {
-        $_POST['name'] = ucwords(strtolower($_POST['name']));
-        $_POST['type'] = ucwords(strtolower($_POST['type']));
-        
-        if($_POST['action'] == 'new')        
-            echo json_encode($this->model->createGroup($_POST));
-        else
-            echo json_encode($this->model->updateGroup($_POST['id'], $_POST));
-        
+    public function getUsersWithPrivilege() {
+        echo json_encode($this->model->getUsersWithPrivilege($_POST['id']));
         exit();
     }
     
-    public function deleteGroup() {
-        echo json_encode($this->model->deleteGroup($_POST['id']));
+    public function removePrivilegeFromUser() {
+        echo json_encode($this->model->removePrivilegeFromUser($_POST['id'], $_POST['userId']));
         exit();
     }
     
-    public function getGroupMembers() {
-        $_POST['memberOfGroup'] = $this->mergeTenant($_POST['memberOfGroup']);
-        echo json_encode($this->model->getGroupMembers($_POST));
+    public function addUserPrivilege() {
+        $privilegeId = $_POST['id'];
+        unset($_POST['id']);
+        echo json_encode($this->model->addUserPrivilege($privilegeId, $_POST));
         exit();
     }
     
-    public function addMemberToGroup() {
-        $_POST['userId'] = $this->mergeTenant($_POST['userId']);
-        echo json_encode($this->model->addMemberToGroup($_POST['id'], $_POST['userId']));
+    public function getGroupsWithPrivilege() {
+        echo json_encode($this->model->getGroupsWithPrivilege($_POST['id']));
         exit();
     }
     
-    public function deleteMemberFromGroup() {
-        $_POST['userId'] = $this->mergeTenant($_POST['userId']);
-        echo json_encode($this->model->deleteMemberFromGroup($_POST['id'], $_POST['userId']));
+    public function removePrivilegeFromGroup() {
+        echo json_encode($this->model->removePrivilegeFromGroup($_POST['id'], $_POST['userId']));
+        exit();
+    }
+    
+    public function addGroupPrivilege() {
+        $privilegeId = $_POST['id'];
+        unset($_POST['id']);
+        echo json_encode($this->model->addGroupPrivilege($privilegeId, $_POST));
         exit();
     }
 }

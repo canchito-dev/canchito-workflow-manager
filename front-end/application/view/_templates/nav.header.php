@@ -16,15 +16,15 @@
 					Processes
 				</a>
 				<div class="dropdown-menu" aria-labelledby="ddMenuProcesses">
-					<a class="dropdown-item" href="<?php echo URL; ?>job-monitor">Job Monitor</a>
-					<div class="dropdown-divider"></div>
+					<a class="dropdown-item d-none" href="<?php echo URL; ?>job-monitor">Job Monitor</a>
+					<div class="dropdown-divider d-none"></div>
 					<h6 class="dropdown-header">Process Management</h6>
-				  	<a class="dropdown-item" href="<?php echo URL; ?>process-deployments">Process Deployments</a>
-				  	<a class="dropdown-item" href="<?php echo URL; ?>process-definitions">Process Definitions</a>
+				  	<a class="dropdown-item" href="<?php echo URL; ?>deployment">Process Deployments</a>
+				  	<a class="dropdown-item" href="<?php echo URL; ?>processdefinition">Process Definitions</a>
 					<div class="dropdown-divider"></div>
 					<h6 class="dropdown-header">Process Monitor</h6>
-				  	<a class="dropdown-item" href="<?php echo URL; ?>running-instances">Running Instances</a>
-				  	<a class="dropdown-item" href="<?php echo URL; ?>historic-instances">Historic Instances</a>
+				  	<a class="dropdown-item" href="<?php echo URL; ?>processinstance">Running Instances</a>
+				  	<a class="dropdown-item" href="<?php echo URL; ?>historicinstance">Historic Instances</a>
 				</div>
 			</li>
 			<li class="nav-item dropdown font-weight-bold">
@@ -35,9 +35,7 @@
 					<h6 class="dropdown-header">Identity Access</h6>
 				  	<a class="dropdown-item" href="<?php echo URL; ?>users">Users</a>
 				  	<a class="dropdown-item" href="<?php echo URL; ?>groups">Groups</a>
-					<div class="dropdown-divider"></div>
-					<h6 class="dropdown-header">Folder Management</h6>
-				  	<a class="dropdown-item" href="<?php echo URL; ?>folder-handlers">Folder Handlers</a>
+				  	<a class="dropdown-item" href="<?php echo URL; ?>privileges">Privileges</a>
 				</div>
 			</li>
 		</ul>
@@ -48,10 +46,11 @@
 				</a>
 				<div class="dropdown-menu dropdown-menu-right" aria-labelledby="ddMenuUser">
 					<h6 class="dropdown-header">Tasks Management</h6>
-					<a class="dropdown-item" href="<?php echo URL; ?>tasks/inbox">Inbox <span class="badge badge-secondary">0</span></a>
-					<a class="dropdown-item" href="<?php echo URL; ?>tasks/my-tasks">My Tasks <span class="badge badge-secondary">0</span></a>
-					<a class="dropdown-item" href="<?php echo URL; ?>tasks/involved-tasks">Involved Tasks <span class="badge badge-secondary">0</span></a>
-					<a class="dropdown-item" href="<?php echo URL; ?>tasks/group-tasks">Group Tasks <span class="badge badge-secondary">0</span></a>
+					<a class="dropdown-item" href="<?php echo URL; ?>task/inbox">Inbox <span class="badge badge-secondary" id="badgeInbox" name="badgeInbox">0</span></a>
+					<a class="dropdown-item" href="<?php echo URL; ?>task/mytasks">My Tasks <span class="badge badge-secondary" id="badgeOwner" name="badgeOwner">0</span></a>
+					<a class="dropdown-item" href="<?php echo URL; ?>task/involvedtasks">Involved Tasks <span class="badge badge-secondary" id="badgeInvolved" name="badgeInvolved">0</span></a>
+					<a class="dropdown-item" href="<?php echo URL; ?>task/grouptasks">Group Tasks <span class="badge badge-secondary" id="badgeGroup" name="badgeGroup">0</span></a>
+					<a class="dropdown-item" href="<?php echo URL; ?>task/unassignedtasks">Unassigned Tasks <span class="badge badge-secondary" id="badgeUnassigned" name="badgeUnassigned">0</span></a>
 					<div class="dropdown-divider"></div>
 					<h6 class="dropdown-header">Account Management</h6>
 				  	<a class="dropdown-item" href="<?php echo URL; ?>tasks/profile">Profile</a>

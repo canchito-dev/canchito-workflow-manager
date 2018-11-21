@@ -31,9 +31,9 @@ namespace Application\Controller;
 
 use Application\Core\Controller;
 
-class Groups extends Controller {
+class Deployment extends Controller {
 	
-	private $modelToLoad = 'Groups';
+	private $modelToLoad = 'Deployment';
 	
 	public function __construct() {
 		/**
@@ -50,89 +50,97 @@ class Groups extends Controller {
 	    $this->model->setAuth($_SESSION['ID'], $_SESSION['PASSWORD']);
 		
 		parent::__construct();
-		
-		if(isset($_POST['id']))
-		    $_POST['id'] = $this->mergeTenant($_POST['id']);
 	}
 	
     /**
      * PAGE: index
-     * This method handles what happens when you move to http://yourproject/users/index
+     * This method handles what happens when you move to http://yourproject/process-deployments/index
      **/
     public function index() {
     	$breadcrumbs = array(
     			'Home' => 'home', 
-    			'Management' => '',
-    			'Identity Access' => '',
-    			'Groups' => 'groups'
+    			'Processes' => '',
+    			'Process Management' => '',
+    			'Process Deployment' => 'deployment'
     	);
     	
     	$localCss = array(
-    	    'jquery-bootgrid/jquery.bootgrid.min',
-    	    'selectize/selectize.default.min'
+    	    'jquery-bootgrid/jquery.bootgrid.min'
     	);
     	$localJs = array(
     	    'jquery-bootgrid/jquery.bootgrid.min',
     	    'jquery-bootgrid/jquery.bootgrid.defaults.min',
-    	    'selectize/selectize.min',
     	    'bootbox/bootbox.min',
     	    'utils/formUtil.min',
-    	    'cwm/users/user.min',
-    	    'cwm/groups/group.min',
-    	    'cwm/groups/groups.min'
+    	    'jquery-file-upload/jquery.ui.widget.min',
+    	    'jquery-file-upload/jquery.iframe-transport.min',
+    	    'jquery-file-upload/jquery.fileupload.min',
+    	    'cwm/deployment/deployment.min',
+    	    'cwm/deployment/deployments.min'
     	);
     	
         // load views
         require APP . 'view/_templates/header.php';
         require APP . 'view/_templates/nav.header.php';
-        require APP . 'view/groups/index.php';
-        require APP . 'view/groups/modal/viewgroup.php';
-        require APP . 'view/groups/modal/filtergroup.php';
+        require APP . 'view/deployment/index.php';
+        require APP . 'view/deployment/modal/filterdeployment.php';
         require APP . 'view/_templates/footer.php';
     }
     
-    public function getSingleGroup() {
-        echo json_encode($this->model->getSingleGroup($_POST['id']));
+    public function getSingleDeployment() {
+        echo json_encode($this->model->getSingleDeployment($_POST['id']));
         exit();
     }
     
-    public function getListOfGroups() {
-        echo json_encode($this->model->getListOfGroups($_POST));
+    public function getListOfDeployments() {
+        echo json_encode($this->model->getListOfDeployments($_POST));
         exit();
     }
     
-    public function saveGroup() {
-        $_POST['name'] = ucwords(strtolower($_POST['name']));
-        $_POST['type'] = ucwords(strtolower($_POST['type']));
+    public function saveDeployment() {
+        if(!empty($_FILES)) {
+            $fileHandler = $this->upload();
+            if($fileHandler->doUpload($_FILES['files'])) {
+                echo json_encode($this->model->createDeployment([
+                    [
+                        'name'     => 'files',
+                        'contents' => fopen($_FILES['files']['tmp_name'], 'r'),
+                        'filename' => $_FILES['files']['name']
+                    ], [
+                        'name'     => 'tenantId',
+                        'contents' => $_SESSION['TENANT_ID'],
+                    ]
+                ]));
+            } else {
+                echo json_encode(array(
+                    'code' => 500,
+                    'reason' => $fileHandler->getErrors(),
+                    'body' => ''
+                ));
+            }
+        } else {
+            echo json_encode(array(
+                'code' => 500,
+                'reason' => 'No file selected',
+                'body' => ''
+            ));
+        }
         
-        if($_POST['action'] == 'new')        
-            echo json_encode($this->model->createGroup($_POST));
-        else
-            echo json_encode($this->model->updateGroup($_POST['id'], $_POST));
-        
         exit();
     }
     
-    public function deleteGroup() {
-        echo json_encode($this->model->deleteGroup($_POST['id']));
+    public function deleteDeployment() {
+        echo json_encode($this->model->deleteDeployment($_POST['id']));
         exit();
     }
     
-    public function getGroupMembers() {
-        $_POST['memberOfGroup'] = $this->mergeTenant($_POST['memberOfGroup']);
-        echo json_encode($this->model->getGroupMembers($_POST));
+    public function getListOfResourcesInDeployment() {
+        echo json_encode($this->model->getListOfResourcesInDeployment($_POST['deploymentId']));
         exit();
     }
     
-    public function addMemberToGroup() {
-        $_POST['userId'] = $this->mergeTenant($_POST['userId']);
-        echo json_encode($this->model->addMemberToGroup($_POST['id'], $_POST['userId']));
-        exit();
-    }
-    
-    public function deleteMemberFromGroup() {
-        $_POST['userId'] = $this->mergeTenant($_POST['userId']);
-        echo json_encode($this->model->deleteMemberFromGroup($_POST['id'], $_POST['userId']));
+    public function getSingleDeploymentResourceContent() {
+        echo json_encode($this->model->getSingleDeploymentResourceContent($_POST['deploymentId'], $_POST['resourceId']));
         exit();
     }
 }

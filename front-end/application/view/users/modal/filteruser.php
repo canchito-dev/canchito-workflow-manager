@@ -30,7 +30,9 @@
 							<div class="input-group mb-2 mb-sm-0">
 								<input type="text" class="form-control" id="userId" name="id" placeholder="Username" 
 									data-rule-maxlength="255">
-								<div class="input-group-addon">@<?php echo $_SESSION['TENANT_ID']; ?></div>
+								<div class="input-group-append">
+									<span class="input-group-text" id="basic-userId-addon">@<?php echo $_SESSION['TENANT_ID']; ?></span>
+								</div>
 							</div>
 						</div>
     				</div>

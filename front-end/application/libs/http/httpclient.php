@@ -37,7 +37,7 @@ class HttpClient {
 	private $client;
 	private $options;
 
-	public function __construct($baseUri = CWM_BASE_URI) {
+	public function __construct($baseUri = CWM_BASE_REST_URL) {
 		if(is_null($baseUri) || empty($baseUri))
 			throw new Core\Exception('No URL specified');
 		
@@ -46,26 +46,19 @@ class HttpClient {
 		$this->options = [
 			'debug' => FALSE,
 			'version' => 1.1,					// Protocol version to use with the request.
-		    'query' => [],						// Query String Parameters. Associative array of query string values or query string to add to the request.
-			'json' => [],						// The json option is used to easily upload JSON encoded data as the body of a request. A Content-Type header of application/json will be added if no Content-Type header is already present on the message.
-			'form_params' => [],				// Sending form fields. Used to send an application/x-www-form-urlencoded POST request
-			'auth' => [],						// Use basic HTTP authentication in the Authorization header (the default setting used if none is specified)
-			'headers' => [						// Associative array of headers to add to the request. Each key is the name of a header, and each value is a string or array of strings representing the header field values
-				'protocol_version' => '1.1',
-				'Content-type: application/json',
-				'Cache-Control: no-cache',
-				'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)',
-			],
-			'http_errors' => FALSE				// Set to false to disable throwing exceptions on an HTTP protocol errors (i.e., 4xx and 5xx responses). Exceptions are thrown by default when HTTP protocol errors are encountered.
+// 		    'query' => [],						// Query String Parameters. Associative array of query string values or query string to add to the request.
+// 			'json' => [],						// The json option is used to easily upload JSON encoded data as the body of a request. A Content-Type header of application/json will be added if no Content-Type header is already present on the message.
+// 			'form_params' => [],				// Sending form fields. Used to send an application/x-www-form-urlencoded POST request
+// 			'auth' => [],						// Use basic HTTP authentication in the Authorization header (the default setting used if none is specified)
+// 			'headers' => [						// Associative array of headers to add to the request. Each key is the name of a header, and each value is a string or array of strings representing the header field values
+// 				'protocol_version' => '1.1',
+// 				'Cache-Control' => 'no-cache',
+// 				'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)',
+// 			],
+			'http_errors' => FALSE,				// Set to false to disable throwing exceptions on an HTTP protocol errors (i.e., 4xx and 5xx responses). Exceptions are thrown by default when HTTP protocol errors are encountered.
+			'json_decode_body' => TRUE,
+		    'stream' => FALSE
 		];
-	}
-	
-	private function response($response = []) {
-		return array(
-			'code' => $response->getStatusCode(),
-			'reason' => $response->getReasonPhrase(),
-			'body' => json_decode($response->getBody())
-		);
 	}
 
 	public function __destruct() {}
@@ -145,13 +138,38 @@ class HttpClient {
 	    $this->options['multipart'] = $multipart;
 	}
 	
+	public function setJsonDecodeBody($jsonDecodeBody = TRUE) {
+	    $this->options['json_decode_body'] = $jsonDecodeBody;
+	}
+	
+	public function getJsonDecodeBody() {
+	    return $this->options['json_decode_body'];
+	}
+	
+	public function setStream($stream = FALSE) {
+	    $this->options['stream'] = $stream;
+	}
+	
+	public function getStream() {
+	    return $this->options['stream'];
+	}
+	
+	private function response($response = []) {
+	    $body = ($this->getJsonDecodeBody()) ? json_decode($response->getBody()) : (string) $response->getBody();
+	    return array(
+	        'code' => $response->getStatusCode(),
+	        'reason' => $response->getReasonPhrase(),
+	        'body' => $body
+	    );
+	}
+	
 	private function request($method = 'GET', $uri) {
-		$response = $this->client->request($method, $uri, $this->options);
-		return $this->response($response);		
+	    $response = $this->client->request($method, $uri, $this->options);
+	    return $this->response($response);
 	}
 	
 	public function get($uri) {
-		return $this->request('GET', $uri);
+	    return $this->request('GET', $uri);
 	}
 	
 	public function post($uri) {

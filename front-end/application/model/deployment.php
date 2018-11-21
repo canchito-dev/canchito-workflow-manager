@@ -25,7 +25,7 @@
  * @author 		Jose Carlos Mendoza Prego
  * @copyright	Copyright (c) 2017, canchito-dev (http://www.canchito-dev.com)
  * @license		http://opensource.org/licenses/MIT	MIT License
- * @link			https://github.com/canchito-dev/canchito-workflow-manager
+ * @link		https://github.com/canchito-dev/canchito-workflow-manager
  **/
 namespace Application\Model;
 
@@ -44,7 +44,7 @@ class Deployment extends HttpClient {
 	);
 	
 	public function __construct()  {
-	    parent::__construct();
+	    parent::__construct(CWM_BPMN_URL);
 	}
 	
 	public function __destruct() {}
@@ -87,6 +87,8 @@ class Deployment extends HttpClient {
 	 * 			400 - Indicates there was no content present in the request body or the content mime-type is not supported for deployment. The status-description contains additional information
 	 **/
 	public function createDeployment($multipart = []) {
+	    @set_time_limit(60);
+	    ini_set("max_execution_time" , "60");
 	    $this->setMultipart($multipart);
 		return $this->post($this->uri['CREATE_A_NEW_DEPLOYMENT']);
 	}
@@ -135,11 +137,14 @@ class Deployment extends HttpClient {
 	 * @link http://www.flowable.org/docs/userguide/index.html#_get_a_deployment_resource_content
 	 * @param string $deploymentId	- The id of the deployment to get
 	 * @param string $resourceId	- The id of the resource to get
-	 * @return	200 - The id of the deployment the requested resource is part of
-	 * 			404 - The id of the resource to get. Make sure you URL-encode the resourceId in case it contains
-	 *                forward slashes. Eg: use diagrams%2Fmy-process.bpmn20.xml instead of diagrams/Fmy-process.bpmn20.xml
+	 * @return	200 - Indicates both deployment and resource have been found and the resource data has been returned.
+	 * 			404 - Indicates the requested deployment was not found or there is no resource with the given id present in the deployment. The status-description contains additional information.
 	 **/
 	public function getSingleDeploymentResourceContent($deploymentId, $resourceId) {
+	    $this->setHeaders([
+	        'Content-Disposition' => 'inline;filename="' . $resourceId . '"'
+	    ]);
+	    $this->setJsonDecodeBody(FALSE);
 	    $uri = str_replace('{deploymentId}', $deploymentId, $this->uri['GET_DEPLOYMENT_RESOURCE_CONTENT']);
 	    $uri = str_replace('{resourceId}', $resourceId, $uri);
 	    return $this->get($uri);

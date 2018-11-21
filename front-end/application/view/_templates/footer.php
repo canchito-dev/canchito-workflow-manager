@@ -43,6 +43,6 @@
 ?>
     
     <!-- Mini-Framework-Mvc ================================================== -->
-    <script src="<?php echo URL; ?>js/cwm.js" type="text/javascript"></script>
+    <script src="<?php echo URL; ?>js/cwm.min.js" type="text/javascript"></script>
 </body>
 </html>

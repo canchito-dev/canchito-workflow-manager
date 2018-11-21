@@ -147,10 +147,10 @@ define('MAX_INACTIVE_SESSION', 30);				// max duration for an inactive session
 /**
  * Configuration: Upload Lib
  **/
-define('UPLOAD_PATH', '../public/img/');			// The path to the directory where the upload should be placed. The directory must be writable and the path can be absolute or relative.
-define('UPLOAD_ALLOWED_EXTENSIONS', serialize (array ('jpg', 'jpeg', 'png')));		// An array corresponding to the types of files you allow to be uploaded. The file extension can be used as the mime type.
+define('UPLOAD_PATH', '../public/deployments/');	// The path to the directory where the upload should be placed. The directory must be writable and the path can be absolute or relative.
+define('UPLOAD_ALLOWED_EXTENSIONS', serialize (array ('zip', 'bpmn', 'bpmn20', 'xml', 'bar')));		// An array corresponding to the types of files you allow to be uploaded. The file extension can be used as the mime type.
 define('UPLOAD_FILENAME', '');						// If set, the uploaded file will be renamed to this name. The extension provided in the file name must also be an allowed extension type. If no extension is provided, the one provided in the original file will be used.
-define('UPLOAD_ENCRYPT_FILENAME', true);			// If true, the filename will be replace with an encrypted random filename
+define('UPLOAD_ENCRYPT_FILENAME', false);			// If true, the filename will be replace with an encrypted random filename
 define('UPLOAD_MAX_FILESIZE', 10000000);			// The maximum size (in kilobytes) that the file can be. Set to zero for no limit. Note: Most PHP installations have their own limit, as specified in the php.ini file. Usually 2 MB (or 2048 KB) by default.
 
 /**
@@ -170,10 +170,30 @@ define('IMG_THUMB_MAX_HEIGHT', 209);			// The maximum height (in pixels) that th
 define('NUMBER_OF_ITEMS_PER_PAGE', 10);				// Max number of items to list in each page
 
 /**
- * Configuration: CWM back-end base URI
+ * Configuration: CWM REST API back-end base URI
  **/
-define('CWM_URL_PROTOCOL', 'http://');
-define('CWM_URL_DOMAIN', 'localhost');
-define('CWM_URL_PORT', '10000');
-define('CWM_URL_SUB_FOLDER', 'canchito-dev-rest');
-define('CWM_BASE_URI', CWM_URL_PROTOCOL . CWM_URL_DOMAIN . ':' . CWM_URL_PORT . '/' . CWM_URL_SUB_FOLDER . '/');
+define('CWM_REST_PROTOCOL', 'http://');
+define('CWM_REST_DOMAIN', 'localhost');
+define('CWM_REST_PORT', '10000');
+define('CWM_REST_FOLDER', 'canchito-dev-rest');
+define('CWM_BASE_REST_URL', CWM_REST_PROTOCOL . CWM_REST_DOMAIN . ':' . CWM_REST_PORT . '/' . CWM_REST_FOLDER . '/');
+
+/**
+ * Flowable Rest API mapping
+ **/
+define('CWM_BPMN_URL', CWM_BASE_REST_URL. 'process-api' . '/');
+define('CWM_CMMN_URL', CWM_BASE_REST_URL. 'cmmn-api' . '/');
+define('CWM_DMN_URL', CWM_BASE_REST_URL. 'dmn-api' . '/');
+define('CWM_IDM_URL', CWM_BASE_REST_URL. 'idm-api' . '/');
+define('CWM_FORM_URL', CWM_BASE_REST_URL. 'form-api' . '/');
+define('CWM_CONTENT_URL', CWM_BASE_REST_URL. 'content-api' . '/');
+define('CWM_APP_URL', CWM_BASE_REST_URL. 'app-api' . '/');
+
+/**
+ * Configuration: CWM ACTUATOR back-end base URI
+ **/
+define('CWM_ACTUATOR_PROTOCOL', 'http://');
+define('CWM_ACTUATOR_DOMAIN', 'localhost');
+define('CWM_ACTUATOR_PORT', '10011');
+define('CWM_ACTUATOR_FOLDER', 'canchito-dev-actuator/actuator');
+define('CWM_BASE_ACTUATOR_URL', CWM_ACTUATOR_PROTOCOL . CWM_ACTUATOR_DOMAIN . ':' . CWM_ACTUATOR_PORT . '/' . CWM_ACTUATOR_FOLDER . '/');

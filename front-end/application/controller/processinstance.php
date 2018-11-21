@@ -31,9 +31,9 @@ namespace Application\Controller;
 
 use Application\Core\Controller;
 
-class Groups extends Controller {
+class ProcessInstance extends Controller {
 	
-	private $modelToLoad = 'Groups';
+	private $modelToLoad = 'ProcessInstance';
 	
 	public function __construct() {
 		/**
@@ -50,21 +50,17 @@ class Groups extends Controller {
 	    $this->model->setAuth($_SESSION['ID'], $_SESSION['PASSWORD']);
 		
 		parent::__construct();
-		
-		if(isset($_POST['id']))
-		    $_POST['id'] = $this->mergeTenant($_POST['id']);
 	}
 	
     /**
      * PAGE: index
-     * This method handles what happens when you move to http://yourproject/users/index
      **/
     public function index() {
     	$breadcrumbs = array(
     			'Home' => 'home', 
-    			'Management' => '',
-    			'Identity Access' => '',
-    			'Groups' => 'groups'
+    			'Processes' => '',
+    			'Process Monitor' => '',
+    			'Running Instances' => 'processinstance'
     	);
     	
     	$localCss = array(
@@ -72,67 +68,67 @@ class Groups extends Controller {
     	    'selectize/selectize.default.min'
     	);
     	$localJs = array(
+    	    'selectize/selectize.min',
     	    'jquery-bootgrid/jquery.bootgrid.min',
     	    'jquery-bootgrid/jquery.bootgrid.defaults.min',
-    	    'selectize/selectize.min',
     	    'bootbox/bootbox.min',
     	    'utils/formUtil.min',
-    	    'cwm/users/user.min',
-    	    'cwm/groups/group.min',
-    	    'cwm/groups/groups.min'
+    	    'cwm/processinstance/processinstance',
+    	    'cwm/processinstance/processinstances'
     	);
     	
         // load views
         require APP . 'view/_templates/header.php';
         require APP . 'view/_templates/nav.header.php';
-        require APP . 'view/groups/index.php';
-        require APP . 'view/groups/modal/viewgroup.php';
-        require APP . 'view/groups/modal/filtergroup.php';
+        require APP . 'view/processinstance/index.php';
         require APP . 'view/_templates/footer.php';
     }
     
-    public function getSingleGroup() {
-        echo json_encode($this->model->getSingleGroup($_POST['id']));
+    public function getSingleProcessInstance() {
+        echo json_encode($this->model->getSingleProcessInstance($_POST['id']));
         exit();
     }
     
-    public function getListOfGroups() {
-        echo json_encode($this->model->getListOfGroups($_POST));
+    public function getListOfProcessInstances() {
+        echo json_encode($this->model->getListOfProcessInstances($_POST));
         exit();
     }
     
-    public function saveGroup() {
-        $_POST['name'] = ucwords(strtolower($_POST['name']));
-        $_POST['type'] = ucwords(strtolower($_POST['type']));
+    public function activateOrSuspendProcessInstance() {
+        $processInstanceId = $_POST['id'];
+        unset($_POST['id']);
+        echo json_encode($this->model->activateOrSuspendProcessInstance($processInstanceId, $_POST));
+        exit();
+    }
+    
+    public function deleteProcessInstance() {
+        echo json_encode($this->model->deleteProcessInstance($_POST['id']));
+        exit();
+    }
+    
+    public function startProcessInstance() {
+        if(isset($_POST['variables'])) {
+            $_POST['variables'] = json_decode($_POST['variables']);
+        } else {
+            $_POST['variables'] = array();
+        }
         
-        if($_POST['action'] == 'new')        
-            echo json_encode($this->model->createGroup($_POST));
-        else
-            echo json_encode($this->model->updateGroup($_POST['id'], $_POST));
-        
+        $_POST['variables'][sizeOf($_POST['variables'])] =  array(
+            'name' => 'initiator', 
+            'value' => $_SESSION['ID']            
+        );
+        echo json_encode($this->model->startProcessInstance($_POST));
         exit();
     }
     
-    public function deleteGroup() {
-        echo json_encode($this->model->deleteGroup($_POST['id']));
-        exit();
-    }
-    
-    public function getGroupMembers() {
-        $_POST['memberOfGroup'] = $this->mergeTenant($_POST['memberOfGroup']);
-        echo json_encode($this->model->getGroupMembers($_POST));
-        exit();
-    }
-    
-    public function addMemberToGroup() {
-        $_POST['userId'] = $this->mergeTenant($_POST['userId']);
-        echo json_encode($this->model->addMemberToGroup($_POST['id'], $_POST['userId']));
-        exit();
-    }
-    
-    public function deleteMemberFromGroup() {
-        $_POST['userId'] = $this->mergeTenant($_POST['userId']);
-        echo json_encode($this->model->deleteMemberFromGroup($_POST['id'], $_POST['userId']));
+    public function getDiagramForProcessInstance() {
+        $uri = CWM_REST_PROTOCOL . CWM_REST_DOMAIN . ':' . CWM_REST_PORT . '/' . CWM_REST_FOLDER . '/' . 'runtime/process-instances/{processInstanceId}/diagram';
+        $uri = str_replace('{processInstanceId}', $_POST['id'], $uri);
+        echo json_encode(array(
+            'code' => '200',
+            'reason' => 'OK',
+            'body' => $uri
+        ));
         exit();
     }
 }

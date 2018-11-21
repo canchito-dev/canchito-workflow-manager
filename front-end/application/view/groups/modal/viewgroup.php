@@ -19,9 +19,6 @@
 							<li class="nav-item">
 								<a class="nav-link disabled" id="group-users-tab" data-toggle="pill" href="#group-users" role="tab" aria-controls="group-users" aria-selected="false">Users</a>
 							</li>
-							<li class="nav-item">
-								<a class="nav-link disabled" id="group-processes-tab" data-toggle="pill" href="#group-processes" role="tab" aria-controls="group-processes" aria-selected="false">Processes</a>
-							</li>
 						</ul>
                         <div class="tab-content" id="group-pills-tabContent">
 							<div class="tab-pane fade show active" id="group-details" role="tabpanel" aria-labelledby="group-details-tab"><!-- start group-details-tab -->
@@ -30,7 +27,9 @@
 									<div class="input-group mb-2 mb-sm-0">
 										<input type="text" class="form-control" id="id" name="id" placeholder="Group Id" 
 											data-rule-maxlength="255" required>
-										<div class="input-group-addon">@<?php echo $_SESSION['TENANT_ID']; ?></div>
+										<div class="input-group-append">
+        									<span class="input-group-text" id="basic-userId-addon">@<?php echo $_SESSION['TENANT_ID']; ?></span>
+        								</div>
 									</div>
 								</div>
 								<div class="form-group">
@@ -55,10 +54,6 @@
                                     </thead>
                                 </table>
 							</div><!-- end group-users-tab -->
-							
-							<div class="tab-pane fade" id="group-processes" role="tabpanel" aria-labelledby="group-processes-tab"><!-- start group-processes-tab -->
-							process
-							</div><!-- end group-processes-tab -->
                         </div>
     				</div>
     			</div>

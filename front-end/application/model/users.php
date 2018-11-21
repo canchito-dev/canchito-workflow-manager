@@ -25,7 +25,7 @@
  * @author 		Jose Carlos Mendoza Prego
  * @copyright	Copyright (c) 2017, canchito-dev (http://www.canchito-dev.com)
  * @license		http://opensource.org/licenses/MIT	MIT License
- * @link			https://github.com/canchito-dev/canchito-workflow-manager
+ * @link		https://github.com/canchito-dev/canchito-workflow-manager
  **/
 namespace Application\Model;
 
@@ -49,7 +49,7 @@ class Users extends HttpClient {
 	);
 	
 	public function __construct()  {
-	    parent::__construct();
+	    parent::__construct(CWM_BPMN_URL);
 	}
 	
 	public function __destruct() {}

@@ -45,7 +45,7 @@ class Controller extends Base {
 
     public function __construct() {
     	if(isset($_POST))
-    		$_POST = array_map('trim', $_POST);
+    		$_POST = @array_map('trim', $_POST);
     }
     
     public function __destruct() {}
@@ -92,6 +92,17 @@ class Controller extends Base {
 	        $model = 'Application\\Model\\' . $model;
 	        $this->model = new $model();
     	}
+    }
+    
+    /**
+     * Loads the "model".
+     **/
+    public function loadModelAndReturnIt($model = null)  {
+        if(!is_null($model)) {
+            require_once APP . 'model/' . $model . '.php';
+            $model = 'Application\\Model\\' . $model;
+            return new $model();
+        }
     }
     
     public function form() {
