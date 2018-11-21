@@ -26,6 +26,7 @@
 		<dependency>
 		    <groupId>commons-collections</groupId>
 		    <artifactId>commons-collections</artifactId>
+			<version>3.2.2</version>
 		</dependency>
 		<!-- Types that extend and augment the Java Collections Framework -->
   	</dependencies>
@@ -57,4 +58,18 @@
             <url>https://repo.spring.io/libs-release</url>
         </pluginRepository>
     </pluginRepositories>
+    
+    <url>https://github.com/canchito-dev/canchito-workflow-manager</url>
+    <description>A RESTful Web Service developed in Spring that extends Flowable engine, and by doing so, it turns it into a very powerful workflow manager</description>
+    <name>canchito-workflow-manager-rest-api</name>
+    
+    <organization>
+    	<name>Canchito Development</name>
+    	<url>http://www.canchito-dev.com</url>
+    </organization>
+    
+    <issueManagement>
+    	<system>Canchito Development</system>
+    	<url>https://github.com/canchito-dev/canchito-workflow-manager/issues</url>
+    </issueManagement>
 </project>

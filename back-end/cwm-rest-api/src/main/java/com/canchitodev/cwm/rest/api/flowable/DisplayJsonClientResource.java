@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ErrorEventDefinition;
@@ -45,6 +44,7 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -249,7 +249,7 @@ public class DisplayJsonClientResource {
         ArrayNode elementArray = objectMapper.createArrayNode();
         ArrayNode flowArray = objectMapper.createArrayNode();
 
-        if (CollectionUtils.isNotEmpty(pojoModel.getPools())) {
+        if (!CollectionUtils.isEmpty(pojoModel.getPools())) {
             ArrayNode poolArray = objectMapper.createArrayNode();
             boolean firstElement = true;
             for (Pool pool : pojoModel.getPools()) {
@@ -259,7 +259,7 @@ public class DisplayJsonClientResource {
                 GraphicInfo poolInfo = pojoModel.getGraphicInfo(pool.getId());
                 fillGraphicInfo(poolNode, poolInfo, true);
                 org.flowable.bpmn.model.Process process = pojoModel.getProcess(pool.getId());
-                if (process != null && CollectionUtils.isNotEmpty(process.getLanes())) {
+                if (process != null && CollectionUtils.isEmpty(process.getLanes())) {
                     ArrayNode laneArray = objectMapper.createArrayNode();
                     for (Lane lane : process.getLanes()) {
                         ObjectNode laneNode = objectMapper.createObjectNode();
@@ -383,7 +383,7 @@ public class DisplayJsonClientResource {
     protected void fillEventTypes(String className, FlowElement element, ObjectNode elementNode) {
         if (eventElementTypes.contains(className)) {
             Event event = (Event) element;
-            if (CollectionUtils.isNotEmpty(event.getEventDefinitions())) {
+            if (CollectionUtils.isEmpty(event.getEventDefinitions())) {
                 EventDefinition eventDef = event.getEventDefinitions().get(0);
                 ObjectNode eventNode = objectMapper.createObjectNode();
                 if (eventDef instanceof TimerEventDefinition) {
