@@ -54,7 +54,7 @@ import com.canchitodev.cwm.services.FolderHandlerService;
 @SpringBootTest
 public class CanchitoWorkfowManagerApplicationTests {
 	
-	private static String DEFAULT_TENANT_ID = "canchito-dev.com";
+	private static String DEFAULT_TENANT_ID = "canchito-dev";
 
 	@Autowired
 	private RepositoryService repositoryService;
@@ -106,7 +106,7 @@ public class CanchitoWorkfowManagerApplicationTests {
 		FileHandler sfh = new FileHandler(
 			"Original",
 			"localToFtp.MPG",
-			this.folderHandlerService.findByNameAndTenantId("LOCAL", Long.parseLong(DEFAULT_TENANT_ID))
+			this.folderHandlerService.findByNameAndTenantId("LOCAL", DEFAULT_TENANT_ID)
 		);
 		
 		Map<String, Object> variableMap = new HashMap<String, Object>();
@@ -128,7 +128,7 @@ public class CanchitoWorkfowManagerApplicationTests {
 		FileHandler sfh = new FileHandler(
 			"Original",
 			"localToAmazonS3.MPG",
-			this.folderHandlerService.findByNameAndTenantId("LOCAL", Long.parseLong(DEFAULT_TENANT_ID))
+			this.folderHandlerService.findByNameAndTenantId("LOCAL", DEFAULT_TENANT_ID)
 		);
 		
 		Map<String, Object> variableMap = new HashMap<String, Object>();
@@ -144,13 +144,13 @@ public class CanchitoWorkfowManagerApplicationTests {
 	public void startLocalToLocalProcess() throws Exception {
 		// Uncomment this line if you want to manually deploy a process definition and assigned to a specific tenant id
 		// Make sure you also have the property spring.activiti.check-process-definitions=false in the application.properties file
-		this.createDeployment("TEST_COPY_LOCAL_TO_LOCAL", DEFAULT_TENANT_ID, "TEST", "TEST_COPY_LOCAL_TO_LOCAL", "copyLocalToLocalProcess.bpmn20.xml", "/processes/CopyTask/CopyLocalToLocal.bpmn");
+//		this.createDeployment("TEST_COPY_LOCAL_TO_LOCAL", DEFAULT_TENANT_ID, "TEST", "TEST_COPY_LOCAL_TO_LOCAL", "copyLocalToLocalProcess.bpmn20.xml", "/processes/CopyTask/CopyLocalToLocal.bpmn");
 		
 		// Set source file handler
 		FileHandler sfh = new FileHandler(
 			"Original",
-			"localToLocal1.mpg",
-			this.folderHandlerService.findByNameAndTenantId("LOCAL", Long.parseLong(DEFAULT_TENANT_ID))
+			"flowable-6.4.0.zip",
+			this.folderHandlerService.findByNameAndTenantId("LOCAL", DEFAULT_TENANT_ID)
 		);
 		
 		Map<String, Object> variableMap = new HashMap<String, Object>();
@@ -172,7 +172,7 @@ public class CanchitoWorkfowManagerApplicationTests {
 		FileHandler sfh = new FileHandler(
 			"Original",
 			"ftpToLocal.MPG",
-			this.folderHandlerService.findByNameAndTenantId("FTP", Long.parseLong(DEFAULT_TENANT_ID))
+			this.folderHandlerService.findByNameAndTenantId("FTP", DEFAULT_TENANT_ID)
 		);
 		
 		Map<String, Object> variableMap = new HashMap<String, Object>();
@@ -194,7 +194,7 @@ public class CanchitoWorkfowManagerApplicationTests {
 		FileHandler sfh = new FileHandler(
 			"Original",
 			"ftpToLocal.MPG",
-			this.folderHandlerService.findByNameAndTenantId("FTP", Long.parseLong(DEFAULT_TENANT_ID))
+			this.folderHandlerService.findByNameAndTenantId("FTP", DEFAULT_TENANT_ID)
 		);
 		
 		Map<String, Object> variableMap = new HashMap<String, Object>();
@@ -216,7 +216,7 @@ public class CanchitoWorkfowManagerApplicationTests {
 		FileHandler sfh = new FileHandler(
 			"Original",
 			"localToAmazonS3.MPG",
-			this.folderHandlerService.findByNameAndTenantId("AMAZON_S3", Long.parseLong(DEFAULT_TENANT_ID))
+			this.folderHandlerService.findByNameAndTenantId("AMAZON_S3", DEFAULT_TENANT_ID)
 		);
 		
 		Map<String, Object> variableMap = new HashMap<String, Object>();
@@ -228,7 +228,7 @@ public class CanchitoWorkfowManagerApplicationTests {
 	}
 	
 	@Test
-//	@Ignore("Status... Passed")
+	@Ignore("Status... Passed")
 	public void startMultipleProcesses() throws Exception {
 		// Uncomment this line if you want to manually deploy a process definition and assigned to a specific tenant id
 		// Make sure you also have the property spring.activiti.check-process-definitions=false in the application.properties file
