@@ -50,7 +50,7 @@ public class FolderHandlerService implements CWMService<FolderHandler, Long> {
 
 	@Override
 	public FolderHandler findById(Long id) {
-		FolderHandler entity = this.folderHandlerRepository.findOne(id);
+		FolderHandler entity = this.folderHandlerRepository.getOne(id);
 
 		if(entity == null)
 			throw new ObjectNotFoundException("Could not find a folder handler with id '" + id + "'");
@@ -114,10 +114,10 @@ public class FolderHandlerService implements CWMService<FolderHandler, Long> {
 
 	@Override
 	public boolean exists(Long id) {
-		return this.folderHandlerRepository.exists(id);
+		return this.folderHandlerRepository.existsById(id);
 	}
 	
-	public FolderHandler findByNameAndTenantId(String name, Long tenantId) {
+	public FolderHandler findByNameAndTenantId(String name, String tenantId) {
 		FolderHandler entity = this.folderHandlerRepository.findByNameAndTenantId(name, tenantId);
 
 		if(entity == null)
