@@ -9,9 +9,6 @@
 	<packaging>jar</packaging>
 	<artifactId>cwm-dao</artifactId>
 	
-	<name>cwm-database-access-objects</name>
-	<description>Layer which give access to the database</description>
-	
 	<dependencies>
 		<dependency>
 			<groupId>com.canchitodev</groupId>
@@ -69,4 +66,18 @@
             <url>https://repo.spring.io/libs-release</url>
         </pluginRepository>
     </pluginRepositories>
+    
+    <url>https://github.com/canchito-dev/canchito-workflow-manager</url>
+	<description>A RESTful Web Service developed in Spring that extends Flowable engine, and by doing so, it turns it into a very powerful workflow manager. Layer which give access to the database</description>
+    <name>canchito-workflow-manager-dao</name>
+    
+    <organization>
+    	<name>Canchito Development</name>
+    	<url>http://www.canchito-dev.com</url>
+    </organization>
+    
+    <issueManagement>
+    	<system>Canchito Development</system>
+    	<url>https://github.com/canchito-dev/canchito-workflow-manager/issues</url>
+    </issueManagement>
 </project>

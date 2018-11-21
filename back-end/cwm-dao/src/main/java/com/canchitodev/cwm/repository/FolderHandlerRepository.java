@@ -36,5 +36,5 @@ import com.canchitodev.cwm.domain.FolderHandler;
 
 @Repository
 public interface FolderHandlerRepository extends JpaRepository<FolderHandler, Long>, JpaSpecificationExecutor<FolderHandler> {
-	FolderHandler findByNameAndTenantId(String name, Long tenantId);
+	FolderHandler findByNameAndTenantId(String name, String tenantId);
 }
