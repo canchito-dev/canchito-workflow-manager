@@ -87,7 +87,7 @@
         </pluginRepository>
     </pluginRepositories>
 	
-	<name>canchito-workflow-manager-maim</name>
+	<name>canchito-workflow-manager-app</name>
 	<description>A RESTful Web Service developed in Spring that extends Flowable engine, and by doing so, it turns it into a very powerful workflow manager</description>
 	
 	<organization>
