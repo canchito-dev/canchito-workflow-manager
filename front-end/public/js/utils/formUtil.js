@@ -41,6 +41,17 @@ var FormUtil = (function() {
 		});
     };
     
+    formUtil.mapFlowableVariablesToForm = function(form, variables) {
+    	$(form).find('.form-control').each(function(index, currentElement) {
+			var result = $.grep(variables, function(element) { 
+				return element.name == currentElement.id; 
+			});
+			
+			if (result.length == 1)
+				formUtil.mapVariableToForm(result[0].value, currentElement);
+		});
+    };
+    
     formUtil.mapVariableToForm = function(value, currentElement) {
     	if(value == undefined || value == null || value == 'null')
 			value = '';

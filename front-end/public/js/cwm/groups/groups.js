@@ -189,7 +189,6 @@ $(document).ready(function() {
 			$groupId.attr('readonly', true).attr("disabled", true);
 			
 			$('#group-pills-tab a:eq(1)').removeClass('disabled');	// Enable user binding
-			$('#group-pills-tab a:eq(2)').removeClass('disabled');	// Enable process binding
 			
 			$usersGrid.bootgrid('reload');
     	}
@@ -211,7 +210,6 @@ $(document).ready(function() {
 		
 		$('#group-pills-tab li:first-child a').tab('show'); // Select first tab
 		$('#group-pills-tab a:eq(1)').addClass('disabled');	// Disable by default user binding
-		$('#group-pills-tab a:eq(2)').addClass('disabled');	// Disable by default process binding
 	});
 	
 	$('form[name="formGroup"]').validate({

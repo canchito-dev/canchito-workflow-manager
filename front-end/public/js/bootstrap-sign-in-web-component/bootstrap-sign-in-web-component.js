@@ -110,7 +110,7 @@
         },
 
         /**
-         * Defines whether the data shall be loaded via an asynchronous HTTP (Ajax) request.
+         * Defines whether should be submitter via an asynchronous HTTP (Ajax) request. Enabled by default.
          *
          * @property ajax
          * @type Boolean
@@ -192,7 +192,7 @@
         validateForm: false,
 
         /**
-         * Enables the form validation. Disabled by default
+         * Error messages to be shown if there are errors during the form submittion.
          *
          * @property formErrorMessages
          * @type Boolean
@@ -205,7 +205,7 @@
         },
 
         /**
-         * Function called before submitting the form. Can be used for doing addiontal things to the form data
+         * Function called before submitting the form. Can be used for doing additional things to the form data
          *
          * @property prepareFormData
          * @type Boolean

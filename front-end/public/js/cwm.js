@@ -34,4 +34,41 @@ $(document).ready(function() {
 	$("body").mLoading('hide');
 	
 	$('[data-toggle="tooltip"]').tooltip();
+	
+	totalTasks();
+	window.setInterval(totalTasks(), 30000);
 });
+
+function totalTasks() {		
+	Ajax.executeAjax(
+		url + 'task/getTotalTasks', 
+		{ limit: 12, offset: 0, sort: 'name', order: 'asc' }, 
+		{
+			beforeSend: function(jqXHR, settings) {},
+			success: function(response) {
+				if(response.code >= 400) {
+	        		if(response.body.hasOwnProperty('exception'))
+	        			response.reason = response.body.message + '. ' + response.body.exception;
+	            	toastr["error"](response.reason);
+	        	} else {
+	        		$.each($('span[name="badgeInbox"]'), function(index, badge) {
+	        			$(badge).html(response.body.assignee);
+	        		});
+	        		$.each($('span[name="badgeOwner"]'), function(index, badge) {
+	        			$(badge).html(response.body.owner);
+	        		});
+	        		$.each($('span[name="badgeInvolved"]'), function(index, badge) {
+	        			$(badge).html(response.body.involved);
+	        		});
+	        		$.each($('span[name="badgeGroup"]'), function(index, badge) {
+	        			$(badge).html(response.body.group);
+	        		});
+	        		$.each($('span[name="badgeUnassigned"]'), function(index, badge) {
+	        			$(badge).html(response.body.unassigned);
+	        		});
+	        	}
+			},
+	        complete: function(jqXHR, textStatus) {}
+		}
+	);
+}
