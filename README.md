@@ -283,7 +283,7 @@ The `execute(DelegateExecution execution)` method is invoked when the service 
 
 The `submitTask(DelegateExecution execution, JSONObject details, String beanId)` method submits an asynchronous task to the actual service. The submit action is actually storing the task in the database table by calling the `save()` method from the _GenericTaskService_ class. You can modify this method according to your database table structure.
 
-After submitting the task and the method returns, the process engine will **not** continue execution. The _TriggerableActivityBehavior_ acts as a wait state. This means, that the process instances is put on hold, until a trigger to continue is received.
+After submitting the task and the method returns, the process engine will **not** continue execution. The _TriggerableActivityBehavior_ acts as a wait state. This means, that the process instances is put on hold, until a trigger is received.
 
 Periodically, the _AcquireTaskThread_ in charge of these kind of service task (in this example, the copy task), read the task que database table. When it finds a new task, it acquires it, and locks it. Once locked, it calls the `run()` method. Here, you will find the business logic for the invoked service task. For our examples, it will problably call functions and method to copy a file from one location to another. When done, _AcquireTaskThread_ will call the `trigger()` method.
 
