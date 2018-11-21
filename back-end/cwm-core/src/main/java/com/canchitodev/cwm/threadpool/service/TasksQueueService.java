@@ -29,26 +29,20 @@
 package com.canchitodev.cwm.threadpool.service;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.springframework.context.ApplicationContext;
 import org.apache.log4j.Logger;
-import org.flowable.engine.RuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.canchitodev.cwm.configuration.properties.QueueConfigurationProperties;
-import com.canchitodev.cwm.configuration.properties.QueueConfigurationProperties.Queue;
 import com.canchitodev.cwm.domain.GenericTaskEntity;
-import com.canchitodev.cwm.exception.GenericException;
-import com.canchitodev.cwm.exception.ObjectNotFoundException;
-import com.canchitodev.cwm.threadpool.runnable.GenericTaskRunnable;
-import com.canchitodev.cwm.threadpool.utils.ExecutorServiceUtils;
+import com.canchitodev.cwm.threadpool.utils.AcquireTaskThread;
 import com.canchitodev.cwm.utils.StrongUuidGenerator;
 import com.canchitodev.cwm.utils.enums.BehaviorTaskStatus;
 
@@ -82,59 +76,52 @@ import com.canchitodev.cwm.utils.enums.BehaviorTaskStatus;
 public class TasksQueueService {
 	
 	private static final Logger logger = Logger.getLogger(TasksQueueService.class);
-
-	private List<Queue> queues;
-	private QueueConfigurationProperties queueConfigProperty;
-	private HashMap<String, ThreadPoolExecutor> executors;
+	
+	private HashMap<String, AcquireTaskThread> acquireTaskThread;
+	
+	@Value("${server.tenant-Id}")
+	private String serverTenantId = "canchito-dev.com";
+	
+	@Autowired
+	private TaskQueueFactory taskQueueFactory;
+	
 	private Object lock;
 	
 	@Autowired
 	private GenericTaskService genericTaskService;
 	
 	@Autowired
-	private ApplicationContext applicationContext;
-	
-	@Autowired
 	private StrongUuidGenerator strongUuidGenerator;
-	
-	@Autowired
-	private RuntimeService runtimeService;
 
 	@Autowired
-	public TasksQueueService(QueueConfigurationProperties queueConfigProperty) {
-		this.queueConfigProperty = queueConfigProperty;
-		this.queues = this.queueConfigProperty.getQueue();
-		this.executors = new HashMap<String, ThreadPoolExecutor>();
-		this.lock = new Object();
+	public TasksQueueService() {
+		this.acquireTaskThread = new HashMap<String, AcquireTaskThread>();
 	}
 
 	@PostConstruct
 	private void loadQueue() {
-		// Create the queues
-		for (Queue queue : this.queues) {
-			logger.info("Starting executor for '" + queue.getBeanId() 
-				+ "' [pool-name: '" + queue.getPoolName() + "']"
-				+ "' [core-pool-size: '" + queue.getCorePoolSize() + "']"
-				+ "' [maximum-pool-size: '" + queue.getMaximumPoolSize() + "']"
-				+ "' [keep-alive-time: '" + queue.getKeepAliveTime() + "']");
-			this.executors.put(
-					queue.getBeanId(),
-					ExecutorServiceUtils.createDefaultExecutorService(
-							queue.getPoolName(), 
-							queue.getCorePoolSize(), 
-							queue.getMaximumPoolSize(), 
-							queue.getKeepAliveTime())
-			);
-		}
+		Map<String, TaskQueue> queues = this.taskQueueFactory.getAllTaskQueues();
 		
-		/**
-		 * Once the queues are created, add those tasks that were previously created to the queue, so that they can be process.
-		 * To be processed, the runnable needs to be re-created and re-submitted
-		 **/
-		List<GenericTaskEntity> tasks = this.genericTaskService.findAll();
-		for (GenericTaskEntity task : tasks) {
-			logger.info("Re-building task queues. Adding task " + task.toString());
-			this.createRunnableAndExecuteIt(task);
+		Set<String> keys = queues.keySet();
+		
+		for (Iterator<String> i = keys.iterator(); i.hasNext(); ) {
+			String beanName = (String) i.next();
+			
+			TaskQueue taskQueue = (TaskQueue) queues.get(beanName);
+			String asyncThreadName = "acquire-" + taskQueue.getPoolName();
+
+			logger.info("Initializing acquire task thread '" + asyncThreadName + "'");
+			this.acquireTaskThread.put(
+					asyncThreadName, 
+					new AcquireTaskThread(
+							this.serverTenantId,
+							this.strongUuidGenerator.getNextId(), 
+							taskQueue
+					)
+			);
+			
+			logger.info("Starting async task thread '" + asyncThreadName + "'");
+			this.acquireTaskThread.get(asyncThreadName).start();
 		}
 	}
 	
@@ -144,26 +131,14 @@ public class TasksQueueService {
 	 * to complete execution.
 	 **/
 	@PreDestroy
-	public void cleanUp() {
-		for (Queue queue : this.queues) {
-			logger.info("Shutting down executor for '" + queue.getBeanId() + "'");
-			this.executors.get(queue.getBeanId()).shutdown();
+	public void onShutDown() {
+		Set<String> keys = acquireTaskThread.keySet();
+		
+		for (Iterator<String> key = keys.iterator(); key.hasNext(); ) {
+			String taskName = (String) key.next();
+			logger.info("Shutting down acquire task thread '" + taskName + "'");
+			this.acquireTaskThread.get(taskName).setShutDown(true);
 		}		
-	}
-	
-	/**
-	 * Adds a new task to its respective queue. This is done in two steps:
-	 * <ul>
-	 * 	<ol>Save the task in the database</ol>
-	 * 	<ol>Call the threadpool's execute function</ol>
-	 * </ul>
-	 * @param task	- The task that has to be save and executed
-	 **/
-	private void createRunnableAndExecuteIt(GenericTaskEntity task) {
-		GenericTaskRunnable runnable = this.applicationContext.getBean(GenericTaskRunnable.class);
-		runnable.setTask(task);
-		logger.info("Submitting task " + task.toString());
-		this.executors.get(task.getBeanId()).execute(runnable);
 	}
 	
 	/**
@@ -179,61 +154,6 @@ public class TasksQueueService {
 				task.setStatus(BehaviorTaskStatus.WAITING.getStatus());
 			
 			this.genericTaskService.save(task);
-			this.createRunnableAndExecuteIt(task);
-		}
-	}
-	
-	/**
-	 * Deletes a task from its respective queue
-	 * @param task	- The task that has to be deleted
-	 * @throws GenericException
-	 */
-	public void delete(GenericTaskEntity task) throws GenericException {
-		synchronized (lock) {
-			GenericTaskRunnable runnable = this.applicationContext.getBean(GenericTaskRunnable.class);
-			runnable.setTask(task);
-			if(this.executors.get(task.getBeanId()).remove(runnable)) {
-				this.genericTaskService.delete(task);
-				logger.info("Delete task " + task.toString());
-			} else {
-				String msg = "Could not delete task " + task.toString();
-				logger.error(msg);
-				throw new GenericException(msg);
-			}
-		}
-	}
-	
-	
-	/**
-	 * Updates the task priority related to the execution id. This is done by:
-	 * <ol>
-	 * 	<li>Searching the task in the queue</li>
-	 * 	<li>Removing it from the queue</li>
-	 * 	<li>Re-submitting the task again with the modified priority</li>
-	 * 	<li>Update the "priority" variable in Activiti's process instance</li>
-	 * </ol>
-	 * @param executionId	- the execution id which task priority will be changed
-	 * @param priority		- the value to which the priority will be changed too
-	 * @throws ObjectNotFoundException
-	 **/
-	public void changeTaskPriorityByExecutionId(String executionId, Integer priority) throws ObjectNotFoundException {
-		synchronized (lock) {
-			GenericTaskEntity task = this.genericTaskService.findByExecutionId(executionId);
-			
-			if(task == null)
-				throw new ObjectNotFoundException("No task related to execution id '" + executionId + "' found");
-			
-			GenericTaskRunnable runnable = this.applicationContext.getBean(GenericTaskRunnable.class);
-			runnable.setTask(task);
-			
-			PriorityBlockingQueue<Runnable> workQueue = (PriorityBlockingQueue<Runnable>) this.executors.get(task.getBeanId()).getQueue();
-			
-			if(workQueue.contains(runnable)) {
-				workQueue.remove(runnable);
-				task.setPriority(priority);
-				this.runtimeService.setVariable(task.getExecutionId(), "priority", priority);
-				this.submit(task);
-			}
 		}
 	}
 }

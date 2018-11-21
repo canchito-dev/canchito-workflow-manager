@@ -28,31 +28,33 @@
  **/
 package com.canchitodev.cwm.behavior;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 import org.apache.log4j.Logger;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.bpmn.behavior.TaskActivityBehavior;
+import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
+import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.canchitodev.cwm.domain.GenericTaskEntity;
 import com.canchitodev.cwm.threadpool.service.GenericTaskService;
-import com.canchitodev.cwm.threadpool.service.TasksQueueService;
+import com.canchitodev.cwm.utils.StrongUuidGenerator;
 import com.canchitodev.cwm.utils.enums.BehaviorTaskStatus;
 
-public abstract class AbstractTaskCanchitoBehavior extends TaskActivityBehavior {
+public abstract class AbstractTaskCanchitoBehavior implements JavaDelegate, TriggerableActivityBehavior, Serializable {
 
 	private static final Logger logger = Logger.getLogger(AbstractTaskCanchitoBehavior.class);
 	
 	private static final long serialVersionUID = -5810695509959387845L;
-
-	@Autowired
-	protected TasksQueueService tasksQueueService;
 	
 	@Autowired
 	private GenericTaskService genericTaskService;
+	
+	@Autowired
+	private StrongUuidGenerator strongUuidGenerator;
 	
 	protected final AtomicLong counter = new AtomicLong();
 	
@@ -72,19 +74,22 @@ public abstract class AbstractTaskCanchitoBehavior extends TaskActivityBehavior 
 	protected void submitTask(DelegateExecution execution, JSONObject details, String beanId) {
 		// Create generic task entity that will be used in the runnable
 		GenericTaskEntity task = new GenericTaskEntity();
+		task.setUuid(this.strongUuidGenerator.getNextId());
 		task.setDetails(details);
 		task.setExecutionId(execution.getId());
 		task.setPriority(this.getTaskPriority(execution));
 		task.setProcessDefinitionId(execution.getProcessDefinitionId());
 		task.setProcessInstanceId(execution.getProcessInstanceId());
 		task.setTenantId(execution.getTenantId());
+		task.setStatus(BehaviorTaskStatus.WAITING.getStatus());
 		task.setBeanId(beanId);
-		this.tasksQueueService.submit(task);
+		
+		this.genericTaskService.save(task);
 	}
 	
+	@Override
 	public void trigger(DelegateExecution execution, String signalName, Object signalData) {
 		this.checkSignal(execution);
-		leave(execution);
 	}
 	
 	/**

@@ -31,18 +31,23 @@ package com.canchitodev.cwm.threadpool.service;
 import java.util.List;
 
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.canchitodev.cwm.domain.GenericTaskEntity;
+import com.canchitodev.cwm.exception.ObjectNotFoundException;
 import com.canchitodev.cwm.repository.GenericTaskRepository;
+import com.canchitodev.cwm.utils.StrongUuidGenerator;
+import com.canchitodev.cwm.utils.enums.BehaviorTaskStatus;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRES_NEW)
 @DependsOn("applicationContextProvider")
+@Scope("prototype")
 public class GenericTaskService {
 	
 	private static final Logger logger = Logger.getLogger(GenericTaskService.class);
@@ -52,27 +57,87 @@ public class GenericTaskService {
 	@Autowired
 	private GenericTaskRepository genericTaskRepository;
 	
+	@Autowired
+	private StrongUuidGenerator strongUuidGenerator;
+	
 	public GenericTaskService() {}
 	
 	public void save(GenericTaskEntity task) {
 		synchronized (lock) {
+			if(task.getUuid() == null)
+				task.setUuid(this.strongUuidGenerator.getNextId());
+			
+			if(task.getStatus() == null)
+				task.setStatus(BehaviorTaskStatus.WAITING.getStatus());
+			
 			this.genericTaskRepository.save(task);
+			logger.info("Generic task '" + task.toString() + "' saved");
+		}
+	}
+	
+	public void update(GenericTaskEntity task) {
+		synchronized (lock) {
+			GenericTaskEntity entity = this.findByUuid(task.getUuid());
+			
+			if(task.getBeanId() == null)
+				task.setBeanId(entity.getBeanId());
+			
+			if(task.getDetails() == null)
+				task.setDetails(entity.getDetails());
+			
+			if(task.getExecutionId() == null)
+				task.setExecutionId(entity.getExecutionId());
+			
+			if(task.getLockOwner() == null)
+				task.setLockOwner(entity.getLockOwner());
+			
+			if(task.getPriority() == null)
+				task.setPriority(entity.getPriority());
+			
+			if(task.getProcessDefinitionId() == null)
+				task.setProcessDefinitionId(entity.getProcessDefinitionId());
+			
+			if(task.getProcessInstanceId() == null)
+				task.setProcessInstanceId(entity.getProcessInstanceId());
+			
+			if(task.getStatus() == null)
+				task.setStatus(entity.getStatus());
+			
+			if(task.getTenantId() == null)
+				task.setTenantId(entity.getTenantId());
+			
+			if(task.getUuid() == null)
+				task.setUuid(entity.getUuid());
+			
+			this.genericTaskRepository.save(task);
+			logger.info("Generic task '" + task.toString() + "' updated");
 		}
 	}
 	
 	public void delete(GenericTaskEntity task) {
 		synchronized (lock) {
 			this.genericTaskRepository.delete(task);
-			logger.info("Delete task " + task.toString());
+			logger.info("Generic task '" + task.toString() + "' deleted");
 		}
 	}
 	
 	public GenericTaskEntity findByProcessDefinitionIdAndProcessInstanceIdAndExecutionId(String processDefinitionId, String processInstanceId, String executionId) {
-		return this.genericTaskRepository.findByProcessDefinitionIdAndProcessInstanceIdAndExecutionId(processDefinitionId, processInstanceId, executionId);
+		GenericTaskEntity entity = this.genericTaskRepository.findByProcessDefinitionIdAndProcessInstanceIdAndExecutionId(processDefinitionId, processInstanceId, executionId);
+		
+		if(entity == null)
+			throw new ObjectNotFoundException("Could not find generic entity task  with process definition id '" + processDefinitionId 
+					+ "', process instance id '" + processInstanceId + "' and execution id '" + executionId + "'");
+		
+		return entity;
 	}
 	
 	public GenericTaskEntity findByUuid(String uuid) {
-		return this.genericTaskRepository.findByUuid(uuid);
+		GenericTaskEntity entity = this.genericTaskRepository.findByUuid(uuid);
+		
+		if(entity == null)
+			throw new ObjectNotFoundException("Could not find generic entity task  with uuid '" + uuid + "'");
+		
+		return entity;
 	}
 	
 	public List<GenericTaskEntity> findAll() {
@@ -80,6 +145,31 @@ public class GenericTaskService {
 	}
 	
 	public GenericTaskEntity findByExecutionId(String executionId) {
-		return this.genericTaskRepository.findByExecutionId(executionId);
+		GenericTaskEntity entity = this.genericTaskRepository.findByExecutionId(executionId);
+		
+		if(entity == null)
+			throw new ObjectNotFoundException("Could not find generic entity task  with execution id '" + executionId + "'");
+		
+		return entity;
+	}
+	
+	public Page<GenericTaskEntity> findByBeanIdAndTenantIdAndLockOwnerIsNullOrderByPriorityDesc(String beanId, String tenantId, Pageable pageable) {
+		return this.genericTaskRepository.findByBeanIdAndTenantIdAndLockOwnerIsNullOrderByPriorityDesc(beanId, tenantId, pageable);
+	}
+	
+	public GenericTaskEntity findByUuidAndLockOwner(String uuid, String lockOwner) {
+		GenericTaskEntity entity = this.genericTaskRepository.findByUuidAndLockOwner(uuid, lockOwner);
+		
+		if(entity == null)
+			throw new ObjectNotFoundException("Could not find generic entity task  with uuid '" + uuid 
+					+ "' and lock owner '" + lockOwner + "'");
+		
+		return entity;
+	}
+	
+	@Transactional
+	public int setTaskStatus(Integer status, String uuid, String lockOwner) {
+		this.findByUuidAndLockOwner(uuid, lockOwner);
+		return this.genericTaskRepository.setTaskStatus(status, uuid, lockOwner);
 	}
 }

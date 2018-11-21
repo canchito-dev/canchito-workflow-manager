@@ -28,8 +28,12 @@
  **/
 package com.canchitodev.cwm.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.canchitodev.cwm.domain.GenericTaskEntity;
@@ -38,5 +42,12 @@ import com.canchitodev.cwm.domain.GenericTaskEntity;
 public interface GenericTaskRepository extends JpaRepository<GenericTaskEntity, String>, JpaSpecificationExecutor<GenericTaskEntity> {
 	GenericTaskEntity findByProcessDefinitionIdAndProcessInstanceIdAndExecutionId(String processDefinitionId, String processInstanceId, String executionId);
 	GenericTaskEntity findByUuid(String uuid);
+	GenericTaskEntity findByUuidAndLockOwner(String uuid, String lockOwner);
 	GenericTaskEntity findByExecutionId(String executionId);
+	
+	Page<GenericTaskEntity> findByBeanIdAndTenantIdAndLockOwnerIsNullOrderByPriorityDesc(String beanId, String tenantId, Pageable pageable);
+	
+	@Modifying(clearAutomatically = true)
+	@Query("UPDATE GenericTaskEntity task SET task.status = ?1 WHERE task.uuid = ?2 AND task.lockOwner = ?3")
+	int setTaskStatus(Integer status, String uuid, String lockOwner);
 }

@@ -1,7 +1,7 @@
 /**
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2017, canchito-dev
+ * Copyright (c) 2018, canchito-dev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,11 @@
  * THE SOFTWARE.
  * 
  * @author 		José Carlos Mendoza Prego
- * @copyright	Copyright (c) 2017, canchito-dev (http://www.canchito-dev.com)
+ * @copyright	Copyright (c) 2018, canchito-dev (http://www.canchito-dev.com)
  * @license		http://opensource.org/licenses/MIT	MIT License
  * @link		https://github.com/canchito-dev/canchito-workflow-manager
  **/
-package com.canchitodev.cwm.threadpool.runnable;
+package com.canchitodev.cwm.threadpool.service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,31 +35,19 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
-import com.canchitodev.cwm.threadpool.runnable.TaskRunnable;
-
 @Service
-public class TaskRunnableFactory {
+public class TaskQueueFactory {
 	
 	private ApplicationContext applicationContext;
 	
-	public TaskRunnableFactory() {
-		applicationContext = new ClassPathXmlApplicationContext("task-runnable-beans.xml");
+	public TaskQueueFactory() {
+		applicationContext = new ClassPathXmlApplicationContext("task-queue-beans.xml");
 	}
 
-	public TaskRunnable getRunnable(String beanId) {
-		if(beanId == null || beanId.isEmpty())
-			return null;
-		
-		if(!this.applicationContext.containsBean(beanId))
-			return null;
-		
-		return (TaskRunnable) this.applicationContext.getBean(beanId);
-	}
-	
-	public Map<String, TaskRunnable> getAllRunnables() {
-		Map<String, TaskRunnable> queues = new HashMap<String, TaskRunnable>();
+	public Map<String, TaskQueue> getAllTaskQueues() {
+		Map<String, TaskQueue> queues = new HashMap<String, TaskQueue>();
 		for(String beanName: applicationContext.getBeanDefinitionNames()) {
-			queues.put(beanName, applicationContext.getBean(beanName, TaskRunnable.class));
+			queues.put(beanName, applicationContext.getBean(beanName, TaskQueue.class));
 		}
 		return queues;
 	}

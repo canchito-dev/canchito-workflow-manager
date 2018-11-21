@@ -35,6 +35,7 @@ import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
@@ -79,10 +80,18 @@ public class GenericTaskEntity implements Serializable {
 	@Column(name = "TENANT_ID_", nullable = true)
 	private String tenantId;
 	
+	@Version
+	@Column(name = "VERSION_", nullable = true)
+	private Integer version;
+	
+	@Column(name = "LOCK_OWNER_", nullable = true)
+	private String lockOwner;
+	
 	public GenericTaskEntity() {}
 
 	public GenericTaskEntity(String uuid, String processDefinitionId, String processInstanceId, String executionId,
-			Integer priority, JSONObject details, String beanId, Integer status, String tenantId) {
+			Integer priority, JSONObject details, String beanId, Integer status, String tenantId, Integer version,
+			String lockOwner) {
 		this.uuid = uuid;
 		this.processDefinitionId = processDefinitionId;
 		this.processInstanceId = processInstanceId;
@@ -92,6 +101,8 @@ public class GenericTaskEntity implements Serializable {
 		this.beanId = beanId;
 		this.status = status;
 		this.tenantId = tenantId;
+		this.version = version;
+		this.lockOwner = lockOwner;
 	}
 
 	public String getUuid() {
@@ -166,18 +177,36 @@ public class GenericTaskEntity implements Serializable {
 		this.tenantId = tenantId;
 	}
 
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+
+	public String getLockOwner() {
+		return lockOwner;
+	}
+
+	public void setLockOwner(String lockOwner) {
+		this.lockOwner = lockOwner;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((beanId == null) ? 0 : beanId.hashCode());
 		result = prime * result + ((executionId == null) ? 0 : executionId.hashCode());
+		result = prime * result + ((lockOwner == null) ? 0 : lockOwner.hashCode());
 		result = prime * result + ((priority == null) ? 0 : priority.hashCode());
 		result = prime * result + ((processDefinitionId == null) ? 0 : processDefinitionId.hashCode());
 		result = prime * result + ((processInstanceId == null) ? 0 : processInstanceId.hashCode());
 		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		result = prime * result + ((tenantId == null) ? 0 : tenantId.hashCode());
 		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+		result = prime * result + ((version == null) ? 0 : version.hashCode());
 		return result;
 	}
 
@@ -199,6 +228,11 @@ public class GenericTaskEntity implements Serializable {
 			if (other.executionId != null)
 				return false;
 		} else if (!executionId.equals(other.executionId))
+			return false;
+		if (lockOwner == null) {
+			if (other.lockOwner != null)
+				return false;
+		} else if (!lockOwner.equals(other.lockOwner))
 			return false;
 		if (priority == null) {
 			if (other.priority != null)
@@ -230,6 +264,11 @@ public class GenericTaskEntity implements Serializable {
 				return false;
 		} else if (!uuid.equals(other.uuid))
 			return false;
+		if (version == null) {
+			if (other.version != null)
+				return false;
+		} else if (!version.equals(other.version))
+			return false;
 		return true;
 	}
 
@@ -237,6 +276,7 @@ public class GenericTaskEntity implements Serializable {
 	public String toString() {
 		return "GenericTaskEntity [uuid=" + uuid + ", processDefinitionId=" + processDefinitionId
 				+ ", processInstanceId=" + processInstanceId + ", executionId=" + executionId + ", priority=" + priority
-				+ ", details=" + details + ", beanId=" + beanId + ", status=" + status + ", tenantId=" + tenantId + "]";
+				+ ", details=" + details + ", beanId=" + beanId + ", status=" + status + ", tenantId=" + tenantId
+				+ ", version=" + version + ", lockOwner=" + lockOwner + "]";
 	}
 }

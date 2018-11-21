@@ -32,38 +32,18 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
 public class ExecutorServiceUtils {
 	
+	private static String DEFAULT_POOL_NAME = "RUNNABLE";
 	private static int DEFAULT_CORE_POOL_SIZE = 10;
 	private static int DEFAULT_MAXIMUM_POOL_SIZE = 10;
-	private static long DFAULT_KEEP_ALIVE_TIME = 0L;
+	private static long DEFAULT_KEEP_ALIVE_TIME = 0L;
+	private static String DEFAULT_LOCK_OWNER = "OWNER";
 	
 	private static final Logger logger = Logger.getLogger(ExecutorServiceUtils.class);
-	
-	private static class DefaultThreadFactory implements ThreadFactory {
-		private final ThreadGroup group;
-		private final AtomicInteger threadNumber = new AtomicInteger(1);
-		private final String namePrefix;
-
-		public DefaultThreadFactory(String poolName) {
-			SecurityManager s = System.getSecurityManager();
-			group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-			namePrefix = poolName + "-thread-";
-		}
-		
-		public Thread newThread(Runnable r) {
-			Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
-			if (t.isDaemon())
-				t.setDaemon(false);
-			if (t.getPriority() != Thread.NORM_PRIORITY)
-				t.setPriority(Thread.NORM_PRIORITY);
-			return t;
-		}
-	}
 	
 	private static PriorityBlockingQueue<Runnable> getWorkQueue() {
 		PriorityBlockingQueue<Runnable> workQueue = new PriorityBlockingQueue<Runnable>();
@@ -84,9 +64,14 @@ public class ExecutorServiceUtils {
      * @return A new thread pool configured with the default settings.
      **/
     public static ThreadPoolExecutor createDefaultExecutorService() {
-    	logger.info("Creating CWM's executor service 'runnable' with corePoolSize '10', maxPoolSize '10' and keepAliveTime '0'");
+		logger.info("Creating executor service '" + DEFAULT_POOL_NAME 
+				+ "' with corePoolSize '" + DEFAULT_CORE_POOL_SIZE 
+				+ "', maxPoolSize '" + DEFAULT_MAXIMUM_POOL_SIZE 
+				+ "', keepAliveTime '" + DEFAULT_KEEP_ALIVE_TIME 
+				+ "' and lockOwner '" + DEFAULT_LOCK_OWNER);
         ThreadFactory threadFactory = ExecutorServiceUtils.createDefaultThreadFactory("runnable");
-        return new DefaultThreadPoolExecutor(DEFAULT_CORE_POOL_SIZE, DEFAULT_MAXIMUM_POOL_SIZE, DFAULT_KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS, getWorkQueue(), threadFactory);
+        return new DefaultThreadPoolExecutor(DEFAULT_CORE_POOL_SIZE, DEFAULT_MAXIMUM_POOL_SIZE, DEFAULT_KEEP_ALIVE_TIME, 
+        		TimeUnit.MILLISECONDS, getWorkQueue(), threadFactory, DEFAULT_LOCK_OWNER);
     }
     
     /**
@@ -95,15 +80,18 @@ public class ExecutorServiceUtils {
 	 * @param corePoolSize		- the number of threads to keep in the pool, even if they are idle
 	 * @param keepAliveTime		- when the number of threads is greater than the core, this is the maximum time that excess idle 
 	 * 							  threads will wait for new tasks before terminating
+	 * @param lockOwner			- the id of the owner of the tasks executed by the thread pool
      * @return A new thread pool configured with the default settings.
      **/
-    public static ThreadPoolExecutor createDefaultExecutorService(String poolName, int corePoolSize, long keepAliveTime) {
-		logger.info("Creating CWM's executor service '" + poolName 
+    public static ThreadPoolExecutor createDefaultExecutorService(String poolName, int corePoolSize, long keepAliveTime, String lockOwner) {
+		logger.info("Creating executor service '" + poolName 
 				+ "' with corePoolSize '" + corePoolSize 
 				+ "', maxPoolSize '" + corePoolSize 
-				+ "' and keepAliveTime '" + keepAliveTime + "'");
+				+ "', keepAliveTime '" + keepAliveTime 
+				+ "' and lockOwner '" + lockOwner);
         ThreadFactory threadFactory = ExecutorServiceUtils.createDefaultThreadFactory(poolName);
-        return new DefaultThreadPoolExecutor(corePoolSize, corePoolSize, keepAliveTime, TimeUnit.MILLISECONDS, getWorkQueue(), threadFactory);
+        return new DefaultThreadPoolExecutor(corePoolSize, corePoolSize, keepAliveTime, 
+        		TimeUnit.MILLISECONDS, getWorkQueue(), threadFactory, lockOwner);
     }
     
     /**
@@ -113,14 +101,17 @@ public class ExecutorServiceUtils {
 	 * @param maximumPoolSize	- the maximum number of threads to create
 	 * @param keepAliveTime		- when the number of threads is greater than the core, this is the maximum time that excess idle 
 	 * 							  threads will wait for new tasks before terminating
+	 * @param lockOwner			- the id of the owner of the tasks executed by the thread pool
      * @return A new thread pool configured with the default settings.
      **/
-    public static ThreadPoolExecutor createDefaultExecutorService(String poolName, int corePoolSize, int maximumPoolSize, long keepAliveTime) {
-		logger.info("Creating CWM's executor service '" + poolName 
+    public static ThreadPoolExecutor createDefaultExecutorService(String poolName, int corePoolSize, int maximumPoolSize, long keepAliveTime, String lockOwner) {
+		logger.info("Creating executor service '" + poolName 
 				+ "' with corePoolSize '" + corePoolSize 
 				+ "', maxPoolSize '" + maximumPoolSize 
-				+ "' and keepAliveTime '" + keepAliveTime + "'");
+				+ "', keepAliveTime '" + keepAliveTime 
+				+ "' and lockOwner '" + lockOwner);
         ThreadFactory threadFactory = ExecutorServiceUtils.createDefaultThreadFactory(poolName);
-        return new DefaultThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, getWorkQueue(), threadFactory);
+        return new DefaultThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, 
+        		TimeUnit.MILLISECONDS, getWorkQueue(), threadFactory, lockOwner);
     }
 }

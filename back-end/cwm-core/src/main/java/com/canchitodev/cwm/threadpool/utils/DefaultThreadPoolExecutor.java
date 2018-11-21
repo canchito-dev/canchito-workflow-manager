@@ -50,6 +50,7 @@ public class DefaultThreadPoolExecutor extends ThreadPoolExecutor {
 	private GenericTaskService genericTaskService;
 	private RuntimeService runtimeService;
 	private Object lock;
+	private String lockOwner;
 
 	/**
 	 * Creates a thread pool that reuses a fixed number of threads operating off a shared unbounded queue, using the provided 
@@ -64,6 +65,7 @@ public class DefaultThreadPoolExecutor extends ThreadPoolExecutor {
 	 * @param unit				- the time unit for the keepAliveTime argument
 	 * @param workQueue			- the queue to use for holding tasks before they are executed. This queue will hold only the Runnable 
 	 * 							  tasks submitted by the execute method
+	 * @param lockOwner			- the thread owner of the task
 	 * @param threadFactory		- the factory to use when the executor creates a new thread
 	 * @throws IllegalArgumentException if one of the following holds:<br>
      *         {@code corePoolSize < 0}<br>
@@ -73,11 +75,12 @@ public class DefaultThreadPoolExecutor extends ThreadPoolExecutor {
      * @throws NullPointerException if {@code workQueue} is null
 	 **/
 	public DefaultThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
-			PriorityBlockingQueue<Runnable> workQueue, ThreadFactory threadFactory) {
+			PriorityBlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, String lockOwner) {
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
 		this.genericTaskService = ApplicationContextProvider.getApplicationContext().getBean(GenericTaskService.class);
 		this.runtimeService = ApplicationContextProvider.getApplicationContext().getBean(RuntimeService.class);
 		this.lock = new Object();
+		this.lockOwner = lockOwner;
 	}
 
 	/** 
@@ -103,7 +106,7 @@ public class DefaultThreadPoolExecutor extends ThreadPoolExecutor {
 			GenericTaskRunnable genericTaskRunnable = (GenericTaskRunnable) runnable;
 			GenericTaskEntity genericTaskEntity = genericTaskRunnable.getTask();
 			genericTaskEntity.setStatus(BehaviorTaskStatus.EXECUTING.getStatus());
-			this.genericTaskService.save(genericTaskEntity);
+			this.genericTaskService.setTaskStatus(genericTaskEntity.getStatus(), genericTaskEntity.getUuid(), this.lockOwner);
 			logger.info("Executing " + runnable.toString() + " using thread " + thread.getName());
 		}
 	}
@@ -135,7 +138,7 @@ public class DefaultThreadPoolExecutor extends ThreadPoolExecutor {
 				logger.info("Done Executing " + runnable.toString());
 				genericTaskEntity.setStatus(BehaviorTaskStatus.DONE.getStatus());
 			}
-			this.genericTaskService.save(genericTaskEntity);
+			this.genericTaskService.setTaskStatus(genericTaskEntity.getStatus(), genericTaskEntity.getUuid(), this.lockOwner);
 			logger.info("Signaling task '" + genericTaskEntity + "'");
 			this.runtimeService.trigger(genericTaskEntity.getExecutionId(), variables);
 		}
