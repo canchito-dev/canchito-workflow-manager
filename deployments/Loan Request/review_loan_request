@@ -1,0 +1,29 @@
+<div class="form-group">
+	<label for="quantity" class="font-weight-bold">Number of days:</label>
+	<div class="input-group mb-3">
+		<input type="number" class="form-control is-form-element" id="quantity" name="quantity" placeholder="Quantity" value="0" readonly>
+		<div class="input-group-append">
+			<span class="input-group-text">€</span>
+		</div>
+	</div>
+</div>
+<div class="form-group">
+	<label for="durationInMonths" class="font-weight-bold">Duration in months:</label>
+	<input type="number" class="form-control is-form-element" id="durationInMonths" name="durationInMonths" placeholder="Duration in months" value="0" readonly>
+</div>
+<div class="form-group">
+	<label for="loanReason" class="font-weight-bold">Reason:</label>
+	<textarea class="form-control is-form-element" id="loanReason" name="loanReason" placeholder="Reason" readonly rows="3"></textarea>
+</div>
+
+<div class="form-group">
+	<label for="loanResult" class="font-weight-bold">Do you approve this loan?:</label>
+	<select class="form-control is-form-element" id="loanResult" name="loanResult" placeholder="Do you approve this loan?" required>
+		<option value="true" selected="selected">Approve</option>
+		<option value="false">Deny</option>
+	</select>
+</div>
+<div class="form-group">
+	<label for="managerReason" class="font-weight-bold">Motivation:</label>
+	<textarea class="form-control is-form-element" id="managerReason" name="managerReason" placeholder="Motivation" required rows="3"></textarea>
+</div>

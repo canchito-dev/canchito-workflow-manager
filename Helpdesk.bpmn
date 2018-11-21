@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples" id="definitions">
+  <process id="helpdeskExample" name="Helpdesk process" isExecutable="true">
+    <startEvent id="theStart"></startEvent>
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="firstLineSupport"></sequenceFlow>
+    <userTask id="firstLineSupport" name="First line support" activiti:assignee="admin@canchito-dev">
+      <documentation>Fix issue raised by customer</documentation>
+    </userTask>
+    <sequenceFlow id="flow2" sourceRef="firstLineSupport" targetRef="normalEnd"></sequenceFlow>
+    <endEvent id="normalEnd"></endEvent>
+    <boundaryEvent id="escalationTimer" attachedToRef="firstLineSupport" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT5M</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow3" sourceRef="escalationTimer" targetRef="handleEscalation"></sequenceFlow>
+    <userTask id="handleEscalation" name="Handle escalated issue" activiti:candidateGroups="admin@canchito-dev,users@canchito-dev">
+      <documentation>Escalation: issue was not fixed in time by first level support</documentation>
+    </userTask>
+    <sequenceFlow id="flow4" sourceRef="handleEscalation" targetRef="escalatedEnd"></sequenceFlow>
+    <endEvent id="escalatedEnd"></endEvent>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_helpdeskExample">
+    <bpmndi:BPMNPlane bpmnElement="helpdeskExample" id="BPMNPlane_helpdeskExample">
+      <bpmndi:BPMNShape bpmnElement="theStart" id="BPMNShape_theStart">
+        <omgdc:Bounds height="35.0" width="35.0" x="270.0" y="14.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="firstLineSupport" id="BPMNShape_firstLineSupport">
+        <omgdc:Bounds height="60.0" width="100.0" x="350.0" y="2.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="escalationTimer" id="BPMNShape_escalationTimer">
+        <omgdc:Bounds height="30.0" width="30.0" x="415.0" y="47.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="normalEnd" id="BPMNShape_normalEnd">
+        <omgdc:Bounds height="35.0" width="35.0" x="490.0" y="15.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="handleEscalation" id="BPMNShape_handleEscalation">
+        <omgdc:Bounds height="60.0" width="100.0" x="458.0" y="91.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="escalatedEnd" id="BPMNShape_escalatedEnd">
+        <omgdc:Bounds height="35.0" width="35.0" x="590.0" y="103.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="305.0" y="31.0"></omgdi:waypoint>
+        <omgdi:waypoint x="350.0" y="32.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="450.0" y="32.0"></omgdi:waypoint>
+        <omgdi:waypoint x="490.0" y="32.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="430.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="429.0" y="121.0"></omgdi:waypoint>
+        <omgdi:waypoint x="458.0" y="121.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="558.0" y="121.0"></omgdi:waypoint>
+        <omgdi:waypoint x="590.0" y="120.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

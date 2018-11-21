@@ -1,0 +1,19 @@
+<div class="form-group">
+	<label for="numberOfDays" class="font-weight-bold">Number of days:</label>
+	<input type="number" class="form-control is-form-element" id="numberOfDays" name="numberOfDays" placeholder="Number of days" value="0" required>
+</div>
+<div class="form-group">
+	<label for="startDate" class="font-weight-bold">First day of holiday (dd-MM-yyy):</label>
+	<input type="text" class="form-control is-form-element" id="startDate" name="startDate" placeholder="First day of holiday (dd-MM-yyy)" required>
+</div>
+<div class="form-group">
+	<label for="vacationMotivation" class="font-weight-bold">Motivation:</label>
+	<textarea class="form-control is-form-element" id="vacationMotivation" name="vacationMotivation" placeholder="Motivation" required rows="3"></textarea>
+</div>
+<div class="form-group">
+	<label for="resendRequest" class="font-weight-bold">Resend vacation request to manager?:</label>
+	<select class="form-control is-form-element" id="resendRequest" name="resendRequest" placeholder="Resend vacation request to manager?" required>
+		<option value="true" selected="selected">Yes</option>
+		<option value="false">No</option>
+	</select>
+</div>

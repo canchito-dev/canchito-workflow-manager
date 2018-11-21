@@ -1,0 +1,11 @@
+<div class="form-group">
+	<label for="resendRequest" class="font-weight-bold">Do you approve this vacation?:</label>
+	<select class="form-control is-form-element" id="vacationApproved" name="vacationApproved" placeholder="Do you approve this vacation?" required>
+		<option value="true" selected="selected">Approve</option>
+		<option value="false">Reject</option>
+	</select>
+</div>
+<div class="form-group">
+	<label for="managerMotivation" class="font-weight-bold">Motivation:</label>
+	<textarea class="form-control is-form-element" id="managerMotivation" name="managerMotivation" placeholder="Motivation" required rows="3"></textarea>
+</div>
