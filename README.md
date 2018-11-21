@@ -271,11 +271,11 @@ If two or more **[CANCHITO-WORKFLOW-MANAGER](http://canchito-dev.com/projects/cw
 ### Async Executor's Design
 In order to understand the way long-running tasks are added to the queue, lets have a look at a very simple workflow as the one in the below image. As you can see, it is composed of a start event, a copy task (which is a service task), and an end event.
 
-![CANCHITO-DEV: async-job-executor-load-queue](http://canchito-dev.com/img/cwm/userguide/canchito_dev_copy_task_sample_workflow.png)
+![CANCHITO-DEV: Copy Task sample workflow](http://canchito-dev.com/img/cwm/userguide/canchito_dev_copy_task_sample_workflow.png)
 
-The copy task is a long-running service task, which needs to be processed by the async job executor. Long-runing tasks in **[CANCHITO-WORKFLOW-MANAGER](http://canchito-dev.com/projects/cwm)** [(CWM)](https://github.com/canchito-dev/canchito-workflow-manager) extend _AbstractTaskCanchitoBehavior_, which at the same time extend from [Flowable](https://www.flowable.org/)'s _TaskActivityBehavior_ class.
+The copy task is a long-running service task, which needs to be processed by the async job executor. Long-runing tasks in **[CANCHITO-WORKFLOW-MANAGER](http://canchito-dev.com/projects/cwm)** [(CWM)](https://github.com/canchito-dev/canchito-workflow-manager) extend _AbstractTaskCanchitoBehavior_, which at the same time extend from [Flowable](https://www.flowable.org/)'s _TriggerableActivityBehavior_ class.
 
-The _TaskActivityBehavior_ parent class for all BPMN 2.0 task types such as ServiceTask, ScriptTask, UserTask, etc. When used on its own, it behaves just as a pass-through activity. This class provides two methods: `execute()`and `trigger()`. The class _AbstractTaskCanchitoBehavior_ provides a two methods: `submitTask()` and `checkSignal(DelegateExecution execution)`. These four methods are the pillars for creating a long-running task implementing the Signallable Flowable Behavior instead of adding two BPMN task (send task and receive task) in your process diagram.
+The _TriggerableActivityBehavior_ is the parent class for many BPMN 2.0 task types such as ReceiveTask, ScriptTask, UserTask, etc. This class provides two methods: `execute()`and `trigger()`. The class _AbstractTaskCanchitoBehavior_ provides a two methods: `submitTask()` and `checkSignal(DelegateExecution execution)`. These four methods are the pillars for creating a long-running task implementing the _TriggerableActivityBehavior_ instead of adding two BPMN task (send task and receive task) in your process diagram.
 
 ![CANCHITO-DEV: CWM's Async Executor Design](http://canchito-dev.com/img/cwm/userguide/canchito_dev_async_executor_design.png)
 
@@ -283,13 +283,13 @@ The `execute(DelegateExecution execution)` method is invoked when the service 
 
 The `submitTask(DelegateExecution execution, JSONObject details, String beanId)` method submits an asynchronous task to the actual service. The submit action is actually storing the task in the database table by calling the `save()` method from the _GenericTaskService_ class. You can modify this method according to your database table structure.
 
-After submitting the task and the method returns, the process engine will **not** continue execution. The _TaskActivityBehavior_ acts as a wait state. This means, that the process instances is put on hold, until a signal to continue is received.
+After submitting the task and the method returns, the process engine will **not** continue execution. The _TriggerableActivityBehavior_ acts as a wait state. This means, that the process instances is put on hold, until a trigger to continue is received.
 
 Periodically, the _AcquireTaskThread_ in charge of these kind of service task (in this example, the copy task), read the task que database table. When it finds a new task, it acquires it, and locks it. Once locked, it calls the `run()` method. Here, you will find the business logic for the invoked service task. For our examples, it will problably call functions and method to copy a file from one location to another. When done, _AcquireTaskThread_ will call the `trigger()` method.
 
 The `trigger(DelegateExecution execution, String signalName, Object signalData)` method is invoked as the process engine is being triggered by the callback. The `trigger()` method is responsible for leaving the service task activity and allowing the normal flow of the process instance. But before leaving the service task, the `checkSignal()` is called. It is in this method, were the execution of the service task's logic is analyzed and determined if it finished correctly or with errors.
 
-By having a separate thread pool for executing long-running tasks, **[CANCHITO-WORKFLOW-MANAGER](http://canchito-dev.com/projects/cwm)** [(CWM)](https://github.com/canchito-dev/canchito-workflow-manager) has decoupled the process engine from the service implementation. From the point of view of [Flowable](https://www.flowable.org/)'s process engine, the _TaskActivityBehavior_ is a wait state: after the `execute()` method returns, the process engine will stop execution, makes the state of the execution to the database persistance and wait for the callback to occure.
+By having a separate thread pool for executing long-running tasks, **[CANCHITO-WORKFLOW-MANAGER](http://canchito-dev.com/projects/cwm)** [(CWM)](https://github.com/canchito-dev/canchito-workflow-manager) has decoupled the process engine from the service implementation. From the point of view of [Flowable](https://www.flowable.org/)'s process engine, the _TriggerableActivityBehavior_ is a wait state: after the `execute()` method returns, the process engine will stop execution, makes the state of the execution to the database persistance and wait for the callback to occure.
 
 As the long-running task implementation is not directly executed by [Flowable](https://www.flowable.org/)'s process engine and it does not participate in the process engine transaction, if there is an error in the service implementation, the failure will not cause the process engine to roll back.
 
