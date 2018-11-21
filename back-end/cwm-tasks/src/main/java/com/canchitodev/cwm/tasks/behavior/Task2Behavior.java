@@ -30,20 +30,36 @@ package com.canchitodev.cwm.tasks.behavior;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.canchitodev.cwm.behavior.AbstractTaskCanchitoBehavior;
+import com.canchitodev.cwm.domain.FileHandler;
+import com.canchitodev.cwm.services.FolderHandlerService;
 
 @Service("task2")
 @Scope("prototype")
 public class Task2Behavior extends AbstractTaskCanchitoBehavior {
 
 	private static final long serialVersionUID = -4740654158860004620L;
+	
+	@Autowired
+	private FolderHandlerService folderHandlerService;
 
 	@Override
 	public void execute(DelegateExecution execution) {
 		try {
+			// Set source file handler
+			FileHandler sfh = new FileHandler(
+				"Original",
+				"flowable-6.4.0.zip",
+				this.folderHandlerService.findByNameAndTenantId("LOCAL", execution.getTenantId())
+			);
+			
+			// Add the destination file handler as Activiti's variable
+			execution.setVariable(sfh.getName(), sfh);
+			
 			this.submitTask(execution, new JSONObject(), "task2Runnable");
 		} catch (Exception e) {
 			this.throwException(execution, 

@@ -28,8 +28,8 @@
  **/
 package com.canchitodev.cwm.tasks.behavior;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +67,7 @@ public class CopyTaskBehavior extends AbstractTaskCanchitoBehavior {
 			FileHandler dfh = new FileHandler(
 				(String) this.destinationFileHandler.getValue(execution),
 				(this.filenamePattern == null) ? sfh.getFilename() : (String) this.filenamePattern.getValue(execution),
-				this.folderHandlerService.findByNameAndTenantId((String) this.destinationFolderHandler.getValue(execution), Long.parseLong(execution.getTenantId()))
+				this.folderHandlerService.findByNameAndTenantId((String) this.destinationFolderHandler.getValue(execution), execution.getTenantId())
 			);
 			
 			// Add the destination file handler as Activiti's variable
@@ -108,7 +108,7 @@ public class CopyTaskBehavior extends AbstractTaskCanchitoBehavior {
 		if(this.destinationFolderHandler == null)
 			throw new IllegalArgumentException("Invalid or missing destination folder handler");
 		else {
-			if(this.folderHandlerService.findByNameAndTenantId((String) this.destinationFolderHandler.getValue(execution), Long.parseLong(execution.getTenantId())) == null)
+			if(this.folderHandlerService.findByNameAndTenantId((String) this.destinationFolderHandler.getValue(execution), execution.getTenantId()) == null)
 				throw new IllegalArgumentException("Destination folder handler does not exists");
 		}
 	}
