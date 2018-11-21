@@ -31,7 +31,7 @@ package com.canchitodev.cwm.utils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StrongUuidGenerator extends org.flowable.engine.common.impl.persistence.StrongUuidGenerator {
+public class StrongUuidGenerator extends org.flowable.common.engine.impl.persistence.StrongUuidGenerator {
 
 	public StrongUuidGenerator() {
 		super();
