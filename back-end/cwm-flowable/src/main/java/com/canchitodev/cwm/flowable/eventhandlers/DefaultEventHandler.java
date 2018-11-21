@@ -29,18 +29,18 @@
 package com.canchitodev.cwm.flowable.eventhandlers;
 
 import org.apache.log4j.Logger;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.event.impl.FlowableEntityEventImpl;
 import org.flowable.engine.delegate.event.impl.FlowableProcessStartedEventImpl;
 import org.flowable.engine.delegate.event.impl.FlowableVariableEventImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 
 public class DefaultEventHandler implements FlowableEventListener {
 	
@@ -306,20 +306,20 @@ public class DefaultEventHandler implements FlowableEventListener {
 				logger.info(event.toString());
 				break;
 
-			case UNCAUGHT_BPMN_ERROR:
-				/**
-				 * When a BPMN Error was thrown, but was not caught within in the process. The process did not have any handlers 
-				 * for that specific error. The event’s activityId will be empty.
-				 **/
-				logger.info(event.toString());
-				break;
+//			case UNCAUGHT_BPMN_ERROR:
+//				/**
+//				 * When a BPMN Error was thrown, but was not caught within in the process. The process did not have any handlers 
+//				 * for that specific error. The event’s activityId will be empty.
+//				 **/
+//				logger.info(event.toString());
+//				break;
 
 			case VARIABLE_CREATED:
 				/**
 				 * A new variable has been created.. The event contains the variable name, value and related execution and task (if any).
 				 **/
 				FlowableVariableEventImpl variableCreated = (FlowableVariableEventImpl) event;
-				logger.info(event.toString());
+				logger.info(variableCreated.toString());
 				break;
 
 			case VARIABLE_UPDATED:
@@ -371,6 +371,13 @@ public class DefaultEventHandler implements FlowableEventListener {
 			     * @see org.flowable.engine.impl.RuntimeServiceImpl#deleteProcessInstance(java.lang.String, java.lang.String), before DB delete.
 			     **/
 				FlowableEntityEventImpl processCompletedWithTerminateEndEvent = (FlowableEntityEventImpl) event;
+				logger.info(processCompletedWithTerminateEndEvent.toString());
+				break;
+
+			case PROCESS_COMPLETED_WITH_ERROR_END_EVENT:		  
+				/**
+				 * A process has been completed with an error end event.
+				 **/
 				logger.info(event.toString());
 				break;
 				
@@ -379,7 +386,7 @@ public class DefaultEventHandler implements FlowableEventListener {
 			     * A process instance has been created. All basic properties have been set, but variables not yet.
 			     **/
 				FlowableEntityEventImpl processCreated = (FlowableEntityEventImpl) event;
-				logger.info(event.toString());
+				logger.info(processCreated.toString());
 				break;
 
 			case PROCESS_STARTED:
@@ -396,13 +403,6 @@ public class DefaultEventHandler implements FlowableEventListener {
 				/**
 				 * A process has been completed. Dispatched after the last activity is ACTIVITY_COMPLETED. Process is completed when it reaches 
 				 * state in which process instance does not have any transition to take.
-				 **/
-				logger.info(event.toString());
-				break;
-
-			case PROCESS_COMPLETED_WITH_ERROR_END_EVENT:		  
-				/**
-				 * A process has been completed with an error end event.
 				 **/
 				logger.info(event.toString());
 				break;
@@ -445,26 +445,54 @@ public class DefaultEventHandler implements FlowableEventListener {
 				logger.info(event.toString());
 				break;
 
-			case MEMBERSHIP_CREATED:
+//			case MEMBERSHIP_CREATED:
+//				/**
+//				 * A new membership has been created. A user has been added to a group. The event contains the ids of the user and group involved.
+//				 **/
+//				logger.info(event.toString());
+//				break;
+//
+//			case MEMBERSHIP_DELETED:
+//				/**
+//				 * A single membership has been deleted. A user has been removed from a group. The event contains the ids of the user and group involved.
+//				 **/
+//				logger.info(event.toString());
+//				break;
+//
+//			case MEMBERSHIPS_DELETED:
+//				/**
+//				 * All memberships in the related group have been deleted. No individual {@link #MEMBERSHIP_DELETED} events will be dispatched due to 
+//				 * possible performance reasons. The event is dispatched before the memberships are deleted, so they can still be accessed in the 
+//				 * dispatch method of the listener.
+//				 **/
+//				logger.info(event.toString());
+//				break;
+				
+			case MULTI_INSTANCE_ACTIVITY_STARTED:
 				/**
-				 * A new membership has been created. A user has been added to a group. The event contains the ids of the user and group involved.
-				 **/
+			     * A multi-instance activity is starting to execute. This event is dispatched right before an activity is executed.
+			     */
 				logger.info(event.toString());
 				break;
 
-			case MEMBERSHIP_DELETED:
-				/**
-				 * A single membership has been deleted. A user has been removed from a group. The event contains the ids of the user and group involved.
-				 **/
+			case MULTI_INSTANCE_ACTIVITY_COMPLETED:
+			    /**
+			     * A multi-instance activity has been completed successfully.
+			     */
 				logger.info(event.toString());
 				break;
 
-			case MEMBERSHIPS_DELETED:
-				/**
-				 * All memberships in the related group have been deleted. No individual {@link #MEMBERSHIP_DELETED} events will be dispatched due to 
-				 * possible performance reasons. The event is dispatched before the memberships are deleted, so they can still be accessed in the 
-				 * dispatch method of the listener.
-				 **/
+			case MULTI_INSTANCE_ACTIVITY_COMPLETED_WITH_CONDITION:
+			    /**
+			     * A multi-instance activity has met its condition and completed successfully.
+			     */
+				logger.info(event.toString());
+				break;
+
+			case MULTI_INSTANCE_ACTIVITY_CANCELLED:
+			    /**
+			     * A multi-instance activity has been cancelled.
+			     */
 				logger.info(event.toString());
 				break;
 		}
@@ -481,6 +509,18 @@ public class DefaultEventHandler implements FlowableEventListener {
 		/**
 		 * The logic in the onEvent method of this listener is not critical, exceptions can be ignored if logging fails...
 		 **/
+		return false;
+	}
+
+	@Override
+	public String getOnTransaction() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isFireOnTransactionLifecycleEvent() {
+		// TODO Auto-generated method stub
 		return false;
 	}
 }

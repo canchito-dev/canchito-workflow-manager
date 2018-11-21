@@ -229,4 +229,10 @@ public class CWMIdmIdentityService implements IdmIdentityService {
 		
 	}
 
+	@Override
+	public void setAuthenticatedUserId(String arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
