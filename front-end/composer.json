@@ -19,7 +19,7 @@
     },
     "require": {
         "php": ">=5.3.0",
-        "phpmailer/phpmailer": "5.2.16",
+        "phpmailer/phpmailer": "6.1.6",
         "guzzlehttp/guzzle": "~6.0@dev"
     },
     "autoload": {
