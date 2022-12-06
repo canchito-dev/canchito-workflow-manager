@@ -34,7 +34,7 @@
 		<amazon.kinesis.client>1.2.1</amazon.kinesis.client>
 		<jcifs.version>1.3.18.2</jcifs.version>
 		<ftp4j.version>1.7.2</ftp4j.version>
-		<apache.common-net.version>3.6</apache.common-net.version>
+		<apache.common-net.version>3.9.0</apache.common-net.version>
 	</properties>
 	
 	<dependencies>
